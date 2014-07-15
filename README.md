@@ -6,7 +6,7 @@ should.
 This is experimental, don't use it.
 
 That being said:
-  License: **BSD-3**.
+  License: **BSD-2**.
 
 ```java
 public class PureIOTest {
