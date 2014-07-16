@@ -59,4 +59,8 @@ public abstract class PureIO<A> {
   public static <A> PureIO<A> free(TerminalOperation<PureIO<A>> a) {
     return new Free<A>(a);
   }
+
+  public static <A,B> PureIO<B> forever(PureIO<A> x) {
+      return x.flatMap(unused -> forever(x));
+  }
 }

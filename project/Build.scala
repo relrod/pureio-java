@@ -5,7 +5,9 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "me.elrod",
     version := "0.0.1-SNAPSHOT",
-    publishTo := Some(Resolver.file("file", new File("releases")))
+    publishTo := Some(Resolver.file("file", new File("releases"))),
+    javacOptions += "-Xlint:unchecked",
+    javacOptions += "-deprecation"
   )
 }
 
