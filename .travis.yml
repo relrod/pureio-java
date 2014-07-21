@@ -5,5 +5,5 @@ install:
   - sudo apt-get update -qq
   - curl -O https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt
   - chmod +x sbt
-  - mv sbt /usr/local/bin/
+  - sudo mv -f sbt /usr/local/bin/
 script: sbt compile
