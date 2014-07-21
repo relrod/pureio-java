@@ -3,7 +3,6 @@ jdk:
   - oraclejdk8
 install:
   - sudo apt-get update -qq
-  - sudo apt-get install sbt curl
   - curl -O https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt
   - chmod +x sbt
   - mv sbt /usr/local/bin/
