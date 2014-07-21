@@ -6,7 +6,10 @@ import java.util.function.Function;
  * The identity monad and comonad, used primarily for delaying evaluation.
  */
 public abstract class Identity<T> {
-    public abstract T run(); // Comonad : Identity<T> -> T
+    /**
+     * Comonadic extraction. A.k.a "Get the value out."
+     */
+    public abstract T run();
 
     /**
      * Functor map.
