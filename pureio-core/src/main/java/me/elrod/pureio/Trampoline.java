@@ -13,22 +13,22 @@ import java.util.function.Function;
 public abstract class Trampoline<A> {
     private Trampoline() {}
 
-    public abstract <R> R cata(
-        final Function<A, R> pure,
-        final Function<Identity<Trampoline<A>>, R> suspend,
-        final BiFunction<Trampoline<A>, Function<A, Trampoline<R>>, R> flatmap);
-
     public abstract Either<Identity<Trampoline<A>>, A> resume();
 
-    private static final class Suspend<A> extends Trampoline<A> {
+    private static abstract class Normal<A> extends Trampoline<A> {
+        public abstract <R> R normalCata(
+            final Function<A, R> pure,
+            final Function<Identity<Trampoline<A>>, R> suspend);
+    }
+
+    private static final class Suspend<A> extends Normal<A> {
         private final Identity<Trampoline<A>> suspension;
         private Suspend(final Identity<Trampoline<A>> s) {
             this.suspension = s;
         }
-        public <R> R cata(
+        public <R> R normalCata(
             final Function<A, R> pure,
-            final Function<Identity<Trampoline<A>>, R> suspend,
-            final BiFunction<Trampoline<A>, Function<A, Trampoline<R>>, R> flatmap) {
+            final Function<Identity<Trampoline<A>>, R> suspend) {
             return suspend.apply(this.suspension);
         }
         public Either<Identity<Trampoline<A>>, A> resume() {
@@ -36,15 +36,14 @@ public abstract class Trampoline<A> {
         }
     }
 
-    private static final class Pure<A> extends Trampoline<A> {
+    private static final class Pure<A> extends Normal<A> {
         private final A value;
         private Pure(final A x) {
             this.value = x;
         }
-        public <R> R cata(
+        public <R> R normalCata(
             final Function<A, R> pure,
-            final Function<Identity<Trampoline<A>>, R> suspend,
-            final BiFunction<Trampoline<A>, Function<A, Trampoline<R>>, R> flatmap) {
+            final Function<Identity<Trampoline<A>>, R> suspend) {
             return pure.apply(this.value);
         }
         public Either<Identity<Trampoline<A>>, A> resume() {
@@ -52,6 +51,7 @@ public abstract class Trampoline<A> {
         }
     }
 
+    /*
     private static final class FlatMap<A, B> extends Trampoline<A> {
         private final Trampoline<A> sub;
         private final Function<A, Trampoline<B>> k;
@@ -70,7 +70,7 @@ public abstract class Trampoline<A> {
 
         public Either<Identity<Trampoline<A>>, A> resume() {
             return null;
-            /*sub.cata(
+            sub.cata(
                 // Pure
                 v -> k.apply(v).resume(),
                 // Suspend
@@ -83,9 +83,10 @@ public abstract class Trampoline<A> {
                 (b, g) -> (new FlatMap<Trampoline<A>, Object>(
                                b,
                                x -> new FlatMap<Trampoline<A>, Object>(g.apply(x), k)
-                               )).resume());*/
+                               )).resume());
         }
     }
+    */
 
     public static <A> Trampoline<A> pure(final A x) {
         return new Pure<A>(x);
@@ -95,9 +96,11 @@ public abstract class Trampoline<A> {
         return new Suspend<A>(x);
     }
 
+    /*
     public static <A, B> Trampoline<A> flatmap(final Trampoline<A> sub, final Function<A, Trampoline<B>> k) {
         return new FlatMap<A, B>(sub, k);
     }
+    */
 
     // This is taken almost directly from FJ for now.
     // Credit:
