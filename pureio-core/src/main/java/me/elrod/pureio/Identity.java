@@ -8,6 +8,9 @@ import java.util.function.Function;
 public abstract class Identity<T> {
     public abstract T run(); // Comonad : Identity<T> -> T
 
+    /**
+     * Functor map.
+     */
     public <U> Identity<U> map(Function<T, U> f) {
         return new Identity<U>() {
             public U run() {
@@ -16,6 +19,20 @@ public abstract class Identity<T> {
         };
     }
 
+    /**
+     * Applicative map.
+     */
+    public <U> Identity<U> applyVia(Identity<Function<T, U>> f) {
+        return new Identity<U>() {
+            public U run() {
+                return f.run().apply(Identity.this.run());
+            }
+        };
+    }
+
+    /**
+     * Monadic bind.
+     */
     public <U> Identity<U> flatMap(Function<T, Identity<U>> f) {
         return f.apply(run());
     }
