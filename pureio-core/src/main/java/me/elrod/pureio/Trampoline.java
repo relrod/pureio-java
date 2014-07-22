@@ -13,7 +13,14 @@ import java.util.function.Function;
 public abstract class Trampoline<A> {
     private Trampoline() {}
 
+    /**
+     * Perform one step of the computation and return the next step.
+     */
     public abstract Either<Identity<Trampoline<A>>, A> resume();
+
+    public abstract <R> R cata(
+        final Function<Normal<A>, R> normal,
+        final Function<Codensity<A>, R> codensity);
 
     private static abstract class Normal<A> extends Trampoline<A> {
         public abstract <R> R normalCata(
@@ -26,6 +33,13 @@ public abstract class Trampoline<A> {
         private Suspend(final Identity<Trampoline<A>> s) {
             this.suspension = s;
         }
+
+        public <R> R cata(
+            final Function<Normal<A>, R> normal,
+            final Function<Codensity<A>, R> codensity) {
+            return normal.apply(this);
+        }
+
         public <R> R normalCata(
             final Function<A, R> pure,
             final Function<Identity<Trampoline<A>>, R> suspend) {
@@ -41,13 +55,36 @@ public abstract class Trampoline<A> {
         private Pure(final A x) {
             this.value = x;
         }
+
+        public <R> R cata(
+            final Function<Normal<A>, R> normal,
+            final Function<Codensity<A>, R> codensity) {
+            return normal.apply(this);
+        }
+
         public <R> R normalCata(
             final Function<A, R> pure,
             final Function<Identity<Trampoline<A>>, R> suspend) {
             return pure.apply(this.value);
         }
+
         public Either<Identity<Trampoline<A>>, A> resume() {
             return Either.right(this.value);
+        }
+    }
+
+    /**
+     * Unfortunately, limits of Java's type system force us to use Object
+     * extensively here. However, this is private and it will be correct by
+     * construction before it is ever used.
+     */
+    private static abstract class Codensity<A> extends Trampoline<A> {
+        private final Normal<Object> sub;
+        private final Function<Object, Trampoline<A>> k;
+
+        private Codensity(Normal<Object> sub, Function<Object, Trampoline<A>> k) {
+            this.sub = sub;
+            this.k = k;
         }
     }
 
