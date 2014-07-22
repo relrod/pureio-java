@@ -22,10 +22,16 @@ public abstract class Trampoline<A> {
         final Function<Normal<A>, R> normal,
         final Function<Codensity<A>, R> codensity);
 
+    public abstract <B> Trampoline<B> flatMap(final Function<A, Trampoline<B>> fn);
+
     private static abstract class Normal<A> extends Trampoline<A> {
         public abstract <R> R normalCata(
             final Function<A, R> pure,
             final Function<Identity<Trampoline<A>>, R> suspend);
+
+        public <B> Trampoline<B> flatMap(final Function<A, Trampoline<B>> fn) {
+            return codensity(this, fn);
+        }
     }
 
     private static final class Suspend<A> extends Normal<A> {
@@ -78,14 +84,41 @@ public abstract class Trampoline<A> {
      * extensively here. However, this is private and it will be correct by
      * construction before it is ever used.
      */
-    private static abstract class Codensity<A> extends Trampoline<A> {
+    private static final class Codensity<A> extends Trampoline<A> {
         private final Normal<Object> sub;
         private final Function<Object, Trampoline<A>> k;
+
+        public <R> R cata(
+            final Function<Normal<A>, R> normal,
+            final Function<Codensity<A>, R> codensity) {
+            return codensity.apply(this);
+        }
 
         private Codensity(Normal<Object> sub, Function<Object, Trampoline<A>> k) {
             this.sub = sub;
             this.k = k;
         }
+
+        public <B> Trampoline<B> flatMap(final Function<A, Trampoline<B>> fn) {
+            return codensity(
+                sub,
+                o -> suspend(new Identity<Trampoline<B>>() {
+                        public Trampoline<B> run() {
+                            return k.apply(o).flatMap(fn);
+                        }
+                    }));
+        }
+
+        public Either<Identity<Trampoline<A>>, A> resume() {
+            throw new RuntimeException("TODO!");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static <A, B> Codensity<B> codensity(
+        final Normal<A> a,
+        final Function<A, Trampoline<B>> k) {
+        return new Codensity<B>((Normal<Object>) a, (Function<Object, Trampoline<B>>) k);
     }
 
     /*
