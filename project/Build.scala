@@ -6,8 +6,8 @@ object BuildSettings {
     organization := "me.elrod",
     version := "0.0.1-SNAPSHOT",
     publishTo := Some(Resolver.file("file", new File("releases"))),
-    javacOptions += "-Xlint:unchecked",
-    javacOptions += "-deprecation"
+    javacOptions in (Compile, compile) += "-Xlint:unchecked",
+    javacOptions in (Compile, compile) += "-deprecation"
   )
 }
 
