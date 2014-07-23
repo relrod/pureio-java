@@ -7,9 +7,28 @@ import java.util.function.Function;
  */
 public abstract class Identity<T> {
     /**
-     * Comonadic extraction. A.k.a "Get the value out."
+     * Comonadic extraction. AKA "copure", "extract", or, colloquially, "Get the
+     * darned value out."
      */
     public abstract T run();
+
+    /**
+     * Comonadic duplication. This does not force.
+     */
+    public Identity<Identity<T>> duplicate() {
+        return new Identity<Identity<T>>() {
+            public Identity<T> run() {
+                return Identity.this;
+            }
+        };
+    }
+
+    /**
+     * Comonadic extension.
+     */
+    public <U> Identity<U> extend(Function<Identity<T>, U> f) {
+        return this.duplicate().map(f);
+    }
 
     /**
      * Functor map.
