@@ -110,7 +110,22 @@ public abstract class Trampoline<A> {
         }
 
         public Either<Identity<Trampoline<A>>, A> resume() {
-            throw new RuntimeException("TODO!");
+            return Either.left(
+                sub.resume().cata(
+                    // Left
+                    p -> p.map(
+                        ot -> ot.cata(
+                            o -> o.normalCata(
+                                obj -> k.apply(obj),
+                                t -> t.run().flatMap(k)),
+                            c -> codensity(
+                                c.sub,
+                                o -> c.k.apply(o).flatMap(k)))),
+                    o -> new Identity<Trampoline<A>>() {
+                        public Trampoline<A> run() {
+                            return k.apply(o);
+                        }
+                    }));
         }
     }
 
