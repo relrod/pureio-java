@@ -32,7 +32,26 @@ public class PureIOTest {
 See more examples in `pureio-examples/`. You might even be able to run them by
 doing `sbt pureio-examples/run`, if luck is going your way.
 
-You need sbt 0.13+ and Java 8.
+## Running it
+
+You need [sbt](https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt)
+0.13+ and Java 8. Just download the script, `chmod +x sbt` and place it
+somewhere in your `$PATH`.
+
+Once you have sbt installed, you should be able to do this:
+
+```
+PATH=/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/:$PATH sbt -java-home /usr/lib/jvm/java-1.8.0-openjdk.x86_64/ pureio-examples/run
+```
+
+For convenience, you can add this to your bash_profile for future use:
+
+```
+alias sbt8='PATH=/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/:$PATH sbt -java-home /usr/lib/jvm/java-1.8.0-openjdk.x86_64/'
+```
+
+and then use `sbt8 pureio-examples/run` to run the examples.
+
 
 ## JavaDoc
 
