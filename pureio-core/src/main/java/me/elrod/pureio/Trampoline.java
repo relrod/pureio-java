@@ -4,11 +4,35 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * A trampoline is a sum type with two basic constructors: Pure and
- * Suspend. A Pure is a leaf value produced at the end of a tree of
- * computations; A Suspend holds a computation that can be resumed.
+ * A trampoline is a sum type with two basic constructors: {@link Pure} and
+ * {@link Suspend}. A {@link Pure} is a leaf value produced at the end of a
+ * tree of computations; A {@link Suspend} holds a computation that can be
+ * resumed.
  *
- * We use {@link Either<A, B>} to construct the tree.
+ * We also introduce the notion of a {@link Codensity} which allows us to bake
+ * a monad directly into the trampoline structure.
+ * c.f. Bjarnason, Rúnar Oli. "Stackless Scala With Free Monads." (2012).
+ *
+ * In Java (as opposed to Scala), it is necessary to create {@link Codensity}
+ * separately than the other two ({@link Suspend}, {@link Pure}) constructors.
+ * The reason for this is that otherwise we cannot construct a catamorphism for
+ * the "monadic constructor" (what we end up calling {@link Codensity} that will
+ * typecheck.
+ *
+ * It is worth noting that we might be able to achieve some of this
+ * functionality by making use of Java 8 streams, but the ease with which this
+ * code could be backported to Java 7 makes me reluctant to do it differently.
+ *
+ * Very little code here is specific to Java 8 -- that is, one could replace the
+ * lambda syntax with an explicit anonymous {@link Function} implementation
+ * (where a custom <pre>interface Function<A, B> { B apply(A x); }</pre> exists)
+ * and this code would likely run on Java 7 with no issue whatsoever.
+ *
+ * We use Java 8 only for demonstration purposes and to lose a bit of the
+ * boilerplate.
+ *
+ * Internally, we use {@link Either<A, B>} to construct the tree of
+ * computations.
  */
 public abstract class Trampoline<A> {
     private Trampoline() {}
@@ -121,6 +145,7 @@ public abstract class Trampoline<A> {
                             c -> codensity(
                                 c.sub,
                                 o -> c.k.apply(o).flatMap(k)))),
+                    // Right
                     o -> new Identity<Trampoline<A>>() {
                         public Trampoline<A> run() {
                             return k.apply(o);
@@ -136,43 +161,6 @@ public abstract class Trampoline<A> {
         return new Codensity<B>((Normal<Object>) a, (Function<Object, Trampoline<B>>) k);
     }
 
-    /*
-    private static final class FlatMap<A, B> extends Trampoline<A> {
-        private final Trampoline<A> sub;
-        private final Function<A, Trampoline<B>> k;
-
-        private FlatMap(final Trampoline<A> sub, final Function<A, Trampoline<B>> k) {
-            this.sub = sub;
-            this.k = k;
-        }
-
-        public <R> R cata(
-            final Function<A, R> pure,
-            final Function<Identity<Trampoline<A>>, R> suspend,
-            final BiFunction<Trampoline<A>, Function<A, Trampoline<R>>, R> flatmap) {
-            return flatmap.apply(this.sub, this.k);
-        }
-
-        public Either<Identity<Trampoline<A>>, A> resume() {
-            return null;
-            sub.cata(
-                // Pure
-                v -> k.apply(v).resume(),
-                // Suspend
-                k2 -> Either.left(new Identity<Trampoline<A>>() {
-                        public Trampoline<A> run() {
-                            return flatmap(k2.run(), k);
-                        }
-                    }),
-                // FlatMap
-                (b, g) -> (new FlatMap<Trampoline<A>, Object>(
-                               b,
-                               x -> new FlatMap<Trampoline<A>, Object>(g.apply(x), k)
-                               )).resume());
-        }
-    }
-    */
-
     public static <A> Trampoline<A> pure(final A x) {
         return new Pure<A>(x);
     }
@@ -181,12 +169,6 @@ public abstract class Trampoline<A> {
         return new Suspend<A>(x);
     }
 
-    /*
-    public static <A, B> Trampoline<A> flatmap(final Trampoline<A> sub, final Function<A, Trampoline<B>> k) {
-        return new FlatMap<A, B>(sub, k);
-    }
-    */
-
     // This is taken almost directly from FJ for now.
     // Credit:
     // https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/Trampoline.java
@@ -194,12 +176,10 @@ public abstract class Trampoline<A> {
         Trampoline<A> current = this;
         while (true) {
             final Either<Identity<Trampoline<A>>, A> x = current.resume();
-            // TODO: Can we use Either#cata here?
             if (x.isLeft()) {
                 Either.LeftP<Identity<Trampoline<A>>, A> y = x.projectLeft();
                 current = y.unsafeValue().run();
             } else {
-                // We hit the end of the tree
                 Either.RightP<Identity<Trampoline<A>>, A> y = x.projectRight();
                 return y.unsafeValue();
             }
