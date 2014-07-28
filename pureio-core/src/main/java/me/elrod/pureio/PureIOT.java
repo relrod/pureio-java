@@ -131,6 +131,7 @@ public abstract class PureIOT<A> {
             final Either<TerminalOperation<PureIOT<A>>, A> x = current.resume();
             if (x.isLeft()) {
                 Either.LeftP<TerminalOperation<PureIOT<A>>, A> y = x.projectLeft();
+                // TODO: Broken - do we need to use Identity again somehow?
                 current = y.unsafeValue();
             } else {
                 Either.RightP<TerminalOperation<PureIOT<A>>, A> y = x.projectRight();
