@@ -3,6 +3,23 @@ package me.elrod.pureio;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * {@link PureIOT<A>} takes the same approach to trampolining as
+ * {@link Trampoline<A>} except it is specialized to
+ * {@link TerminalOperation<A>} because Java doesn't give us the ability to
+ * abstract over type constructors.
+ *
+ * So, much of this is like a huge copypaste mix of {@link PureIO<A>} and
+ * {@link Trampoline<A>} into one mess of a structure.
+ *
+ * The end result, however, is a trampolining free IO monad, which might work.
+ *
+ * Where {@link Trampoline<A>} is <pre>Codensity (Free Identity)</pre>, and
+ * {@link PureIO<A>} is <pre>Free TerminalOperation</pre>, {@link PureIOT<A>}
+ * is <pre>Codensity (Free TerminalOperation)</pre>.
+ *
+ * Right now, it lacks a <pre>run()</pre> method.
+ */
 public abstract class PureIOT<A> {
     private PureIOT() {}
 
