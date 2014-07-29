@@ -2,6 +2,12 @@ package me.elrod.pureio;
 
 import java.io.*;
 
+/**
+ * A compatibility interpreter for our free IO monads to make them do things in
+ * a way that a typical Java environment might expect.
+ *
+ * You could implement your own to do cooler, better, things.
+ */
 public class UnsafePerformIO {
   final static BufferedReader in =
     new BufferedReader(new InputStreamReader(System.in));

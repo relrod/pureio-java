@@ -3,6 +3,10 @@ package me.elrod.pureio;
 import java.io.*;
 import java.util.function.Function;
 
+/**
+ * A simple, untrampolined free IO monad:
+ * <code>Free</code> {@link TerminalOperation}.
+ */
 public abstract class PureIO<A> {
   private PureIO() {
   }
@@ -23,6 +27,8 @@ public abstract class PureIO<A> {
     Function<A, B> pure,
     Function<TerminalOperation<PureIO<A>>, B> free);
 
+  //----------------------------------------------------------------------
+
   final static class Pure<A> extends PureIO<A> {
     private A a;
 
@@ -41,6 +47,8 @@ public abstract class PureIO<A> {
   public static <A> PureIO<A> pure(A a) {
     return new Pure<A>(a);
   }
+
+  //----------------------------------------------------------------------
 
   final static class Free<A> extends PureIO<A> {
     private TerminalOperation<PureIO<A>> a;

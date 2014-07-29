@@ -66,13 +66,21 @@ public abstract class Either<A, B> {
         return new RightP<A, B>(this);
     }
 
-    public static final class LeftP<A, B> {
+    /**
+     * Left projection of {@link Either}.
+     */
+    protected static final class LeftP<A, B> {
         private final Either<A, B> original;
         private LeftP(final Either<A, B> original) {
             this.original = original;
         }
 
-        // Unsafe (comonadic)
+        /**
+         * Get the value out of the projection.
+         *
+         * Unsafe (acts as comonadic <code>extract</code>), throws a
+         * {@link RuntimeException} if called on a <code>Right</code>.
+         */
         public A unsafeValue() {
             if (original.isLeft())
                 return ((Left<A, B>) original).x;
@@ -81,13 +89,21 @@ public abstract class Either<A, B> {
         }
     }
 
-    public static final class RightP<A, B> {
+    /**
+     * Right projection of {@link Either}.
+     */
+    protected static final class RightP<A, B> {
         private final Either<A, B> original;
         private RightP(final Either<A, B> original) {
             this.original = original;
         }
 
-        // Unsafe (comonadic)
+        /**
+         * Get the value out of the projection.
+         *
+         * Unsafe (acts as comonadic <code>extract</code>), throws a
+         * {@link RuntimeException} if called on a <code>Left</code>.
+         */
         public B unsafeValue() {
             if (original.isRight())
                 return ((Right<A, B>) original).x;
