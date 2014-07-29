@@ -92,6 +92,7 @@ public abstract class PureIOT<A> {
                 o -> k.apply(o).flatMap(fn));
         }
 
+        @SuppressWarnings("unchecked")
         public Either<TerminalOperation<PureIOT<A>>, A> resume() {
             return cata(
                 // Normal
@@ -100,10 +101,24 @@ public abstract class PureIOT<A> {
                     v -> k.apply(v).resume(),
 
                     // More(kk)
-                    kk -> { throw new RuntimeException("TODO!"); }),
+                    kk -> Either.left(kk.map(
+                                          new Function<PureIOT<A>, PureIOT<A>>() {
+                                              public PureIOT<A> apply(PureIOT<A> x) {
+                                                  // Holy crap this is terrible.
+                                                  // If you are a future employer, I swear I don't normally write
+                                                  // code like this.
+                                                  return ((PureIOT<Object>)x).flatMap(k);
+                                              }
+                                          }))),
 
                 // Codensity
-                c -> c.sub.flatMap(o -> c.k.apply(o).flatMap(k)));
+                c -> c.sub.flatMap(
+                    new Function<Object, PureIOT<A>>() {
+                        public PureIOT<A> apply(Object o) {
+                            // Ugh, I want to cry.
+                            return ((Codensity<Object>)c).k.apply(o).flatMap(k);
+                        }
+                    }).resume());
         }
     }
 
@@ -122,6 +137,7 @@ public abstract class PureIOT<A> {
         return new Suspend<A>(x);
     }
 
+    /*
     // This is taken almost directly from FJ for now.
     // Credit:
     // https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/PureIOT.java
@@ -131,7 +147,6 @@ public abstract class PureIOT<A> {
             final Either<TerminalOperation<PureIOT<A>>, A> x = current.resume();
             if (x.isLeft()) {
                 Either.LeftP<TerminalOperation<PureIOT<A>>, A> y = x.projectLeft();
-                // TODO: Broken - do we need to use Identity again somehow?
                 current = y.unsafeValue();
             } else {
                 Either.RightP<TerminalOperation<PureIOT<A>>, A> y = x.projectRight();
@@ -139,4 +154,5 @@ public abstract class PureIOT<A> {
             }
         }
     }
+    */
 }
