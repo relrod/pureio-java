@@ -31,7 +31,7 @@ import java.util.function.Function;
  * We use Java 8 only for demonstration purposes and to lose a bit of the
  * boilerplate.
  *
- * Internally, we use {@link Either<A, B>} to construct the tree of
+ * Internally, we use {@link Either} to construct the tree of
  * computations.
  */
 public abstract class Trampoline<A> {
