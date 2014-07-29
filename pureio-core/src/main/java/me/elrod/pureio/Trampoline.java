@@ -25,8 +25,8 @@ import java.util.function.Function;
  *
  * Very little code here is specific to Java 8 -- that is, one could replace the
  * lambda syntax with an explicit anonymous {@link Function} implementation
- * (where a custom <pre>interface Function<A, B> { B apply(A x); }</pre> exists)
- * and this code would likely run on Java 7 with no issue whatsoever.
+ * (where a custom <code>interface Function<A, B> { B apply(A x); }</code>
+ * exists) and this code would likely run on Java 7 with no issue whatsoever.
  *
  * We use Java 8 only for demonstration purposes and to lose a bit of the
  * boilerplate.

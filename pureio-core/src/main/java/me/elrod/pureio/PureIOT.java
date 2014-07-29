@@ -13,11 +13,11 @@ import java.util.function.Function;
  *
  * The end result, however, is a trampolining free IO monad, which might work.
  *
- * Where {@link Trampoline} is <pre>Codensity (Free Identity)</pre>, and
- * {@link PureIO} is <pre>Free TerminalOperation</pre>, {@link PureIOT}
- * is <pre>Codensity (Free TerminalOperation)</pre>.
+ * Where {@link Trampoline} is <code>Codensity (Free Identity)</code>, and
+ * {@link PureIO} is <code>Free TerminalOperation</code>, {@link PureIOT}
+ * is <code>Codensity (Free TerminalOperation)</code>.
  *
- * Right now, it lacks a <pre>run()</pre> method.
+ * Right now, it lacks a <code>run()</code> method.
  */
 public abstract class PureIOT<A> {
     private PureIOT() {}
