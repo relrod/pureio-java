@@ -3,7 +3,10 @@ package me.elrod.pureio;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-abstract class TerminalOperation<A> {
+/**
+ * A sum type for all terminal-related operations one might perform.
+ */
+ public abstract class TerminalOperation<A> {
     private TerminalOperation() {
     }
 
