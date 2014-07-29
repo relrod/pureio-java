@@ -13,9 +13,9 @@ public class UnsafePerformIO {
     new BufferedReader(new InputStreamReader(System.in));
 
   public static <A> A unsafePerformIO(PureIO<A> t) {
-    return t.fold(
+    return t.cata(
       a -> a,
-      a -> a.fold(
+      a -> a.cata(
         (s, tt) -> {
           System.out.println(s);
           return unsafePerformIO(tt);

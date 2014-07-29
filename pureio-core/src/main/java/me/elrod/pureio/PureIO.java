@@ -13,17 +13,17 @@ public abstract class PureIO<A> {
 
   // Functor
   public <B> PureIO<B> map(Function<A, B> f) {
-    return fold(
+    return cata(
       a -> PureIO.pure(f.apply(a)),
       a -> PureIO.free(a.map(k -> k.map(f))));
   }
 
   // Free monad
   public <B> PureIO<B> flatMap(Function<A, PureIO<B>> f) {
-    return fold(f, a -> PureIO.free(a.map(k -> k.flatMap(f))));
+    return cata(f, a -> PureIO.free(a.map(k -> k.flatMap(f))));
   }
 
-  public abstract <B> B fold(
+  public abstract <B> B cata(
     Function<A, B> pure,
     Function<TerminalOperation<PureIO<A>>, B> free);
 
@@ -36,7 +36,7 @@ public abstract class PureIO<A> {
       this.a = a;
     }
 
-    public <B> B fold(
+    public <B> B cata(
       Function<A, B> pure,
       Function<TerminalOperation<PureIO<A>>, B> free) {
         return pure.apply(a);
@@ -57,7 +57,7 @@ public abstract class PureIO<A> {
       this.a = a;
     }
 
-    public <B> B fold(
+    public <B> B cata(
       Function<A, B> pure,
       Function<TerminalOperation<PureIO<A>>, B> free) {
         return free.apply(a);

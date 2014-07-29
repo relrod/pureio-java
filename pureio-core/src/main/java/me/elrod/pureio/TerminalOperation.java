@@ -10,7 +10,7 @@ import java.util.function.Function;
     private TerminalOperation() {
     }
 
-    public abstract <B> B fold(
+    public abstract <B> B cata(
       BiFunction<String, A, B> putStrLn,
       Function<Function<String, A>, B> readLine,
       BiFunction<Integer, A, B> exit
@@ -25,7 +25,7 @@ import java.util.function.Function;
           this.a = a;
       }
 
-      public <B> B fold(
+      public <B> B cata(
         BiFunction<String, A, B> putStrLn,
         Function<Function<String, A>, B> readLine,
         BiFunction<Integer, A, B> exit
@@ -41,7 +41,7 @@ import java.util.function.Function;
           this.f = f;
       }
 
-      public <B> B fold(
+      public <B> B cata(
         BiFunction<String, A, B> putStrLn,
         Function<Function<String, A>, B> readLine,
         BiFunction<Integer, A, B> exit
@@ -59,7 +59,7 @@ import java.util.function.Function;
           this.a = a;
       }
 
-      public <B> B fold(
+      public <B> B cata(
         BiFunction<String, A, B> putStrLn,
         Function<Function<String, A>, B> readLine,
         BiFunction<Integer, A, B> exit
@@ -70,7 +70,7 @@ import java.util.function.Function;
 
     // Functor
     public <B> TerminalOperation<B> map(Function<A, B> f) {
-      return fold(
+      return cata(
                   // new BiFunction<String, A, B>(s, a) { apply = new PutStrLn<B>(s, f.apply(a); }
         (s, a) -> new PutStrLn<B>(s, f.apply(a)),
         g      -> new ReadLine<B>(s -> f.apply(g.apply(s))),
