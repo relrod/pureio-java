@@ -9,29 +9,53 @@ import java.io.*;
  * You could implement your own to do cooler, better, things.
  */
 public class UnsafePerformIO {
-  final static BufferedReader in =
-    new BufferedReader(new InputStreamReader(System.in));
+    final static BufferedReader in =
+        new BufferedReader(new InputStreamReader(System.in));
 
-  public static <A> A unsafePerformIO(PureIO<A> t) {
-    return t.cata(
-      a -> a,
-      a -> a.cata(
-        (s, tt) -> {
-          System.out.println(s);
-          return unsafePerformIO(tt);
-        },
-        f       -> {
-          try {
-            String s = in.readLine();
-            return unsafePerformIO(f.apply(s));
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        },
-        (ec, tt) -> {
-          System.exit(ec);
-          return unsafePerformIO(tt);
-        }
-    ));
-  }
+    public static <A> A unsafePerformIO(PureIO<A> t) {
+        return t.cata(
+            a -> a,
+            a -> a.cata(
+                (s, tt) -> {
+                    System.out.println(s);
+                    return unsafePerformIO(tt);
+                },
+                f       -> {
+                    try {
+                        String s = in.readLine();
+                        return unsafePerformIO(f.apply(s));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                (ec, tt) -> {
+                    System.exit(ec);
+                    return unsafePerformIO(tt);
+                }
+                        ));
+    }
+
+    /**
+     * Same thing as {@link unsafePerformIO} except for {@link PureIOT}-style
+     * trampolining.
+     */
+    public static <A> PureIOT<A> unsafePerformIOT(TerminalOperation<PureIOT<A>> t) {
+        return t.cata(
+            (s, tt) -> {
+                System.out.println(s);
+                return tt;
+            },
+            f       -> {
+                try {
+                    String s = in.readLine();
+                    return f.apply(s);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            },
+            (ec, tt) -> {
+                System.exit(ec);
+                return tt;
+            });
+    }
 }

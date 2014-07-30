@@ -110,7 +110,7 @@ public abstract class PureIOT<A> {
 
         @SuppressWarnings("unchecked")
         public Either<TerminalOperation<PureIOT<A>>, A> resume() {
-            return cata(
+            return sub.cata(
                 // Normal
                 n -> n.normalCata(
                     // Pure(v)
@@ -118,12 +118,12 @@ public abstract class PureIOT<A> {
 
                     // More(kk)
                     kk -> Either.left(kk.map(
-                                          new Function<PureIOT<A>, PureIOT<A>>() {
-                                              public PureIOT<A> apply(PureIOT<A> x) {
+                                          new Function<PureIOT<Object>, PureIOT<A>>() {
+                                              public PureIOT<A> apply(PureIOT<Object> x) {
                                                   // Holy crap this is terrible.
                                                   // If you are a future employer, I swear I don't normally write
                                                   // code like this.
-                                                  return ((PureIOT<Object>)x).flatMap(k);
+                                                  return x.flatMap(k);
                                               }
                                           }))),
 
@@ -153,7 +153,6 @@ public abstract class PureIOT<A> {
         return new Suspend<A>(x);
     }
 
-    /*
     // This is taken almost directly from FJ for now.
     // Credit:
     // https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/PureIOT.java
@@ -163,12 +162,11 @@ public abstract class PureIOT<A> {
             final Either<TerminalOperation<PureIOT<A>>, A> x = current.resume();
             if (x.isLeft()) {
                 Either.LeftP<TerminalOperation<PureIOT<A>>, A> y = x.projectLeft();
-                current = y.unsafeValue();
+                current = UnsafePerformIO.unsafePerformIOT(y.unsafeValue());
             } else {
                 Either.RightP<TerminalOperation<PureIOT<A>>, A> y = x.projectRight();
                 return y.unsafeValue();
             }
         }
     }
-    */
 }

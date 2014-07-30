@@ -80,4 +80,8 @@ import java.util.function.Function;
     public PureIO<A> liftF() {
       return PureIO.free(map(x -> PureIO.pure(x)));
     }
+
+    public PureIOT<A> liftT() {
+      return PureIOT.suspend(map(x -> PureIOT.pure(x)));
+    }
 }

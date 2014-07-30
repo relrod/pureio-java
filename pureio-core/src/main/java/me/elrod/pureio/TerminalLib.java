@@ -8,11 +8,23 @@ public class TerminalLib {
         return new TerminalOperation.PutStrLn<Unit>(s, Unit.VALUE).liftF();
     }
 
+    public static PureIOT<Unit> putStrLnT(String s) {
+        return new TerminalOperation.PutStrLn<Unit>(s, Unit.VALUE).liftT();
+    }
+
     public static PureIO<String> readLine() {
         return new TerminalOperation.ReadLine<String>(Function.identity()).liftF();
     }
 
+    public static PureIOT<String> readLineT() {
+        return new TerminalOperation.ReadLine<String>(Function.identity()).liftT();
+    }
+
     public static PureIO<Unit> exit(Integer exitCode) {
         return new TerminalOperation.Exit<Unit>(exitCode, Unit.VALUE).liftF();
+    }
+
+    public static PureIOT<Unit> exitT(Integer exitCode) {
+        return new TerminalOperation.Exit<Unit>(exitCode, Unit.VALUE).liftT();
     }
 }
