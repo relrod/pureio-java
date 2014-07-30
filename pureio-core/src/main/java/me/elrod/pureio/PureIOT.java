@@ -31,7 +31,25 @@ public abstract class PureIOT<A> {
         final Function<Normal<A>, R> normal,
         final Function<Codensity<A>, R> codensity);
 
+    /**
+     * Monadic bind. Internally, this is reified to the type level, in order for
+     * the trampolining technique to work.
+     */
     public abstract <B> PureIOT<B> flatMap(final Function<A, PureIOT<B>> fn);
+
+    /**
+     * Functor map. This is implemented in terms of {@link flatMap}.
+     */
+    public <B> PureIOT<B> map(final Function<A, B> fn) {
+        return this.flatMap(x -> pure(fn.apply(x)));
+    }
+
+    /**
+     * Applicative pattern - function application.
+     */
+    public <B> PureIOT<B> applyVia(final PureIOT<Function<A, B>> fn) {
+        return fn.flatMap(y -> flatMap(z -> pure(y.apply(z))));
+    }
 
     private static abstract class Normal<A> extends PureIOT<A> {
         public abstract <R> R normalCata(
