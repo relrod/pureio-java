@@ -10,6 +10,6 @@ public class HelloTrampoline {
       .flatMap(x -> TerminalLib.exitT(0));
 
   public static void main(String[] args) {
-      program.run();
+      program.run(x -> UnsafePerformIO.unsafePerformIOT(x));
   }
 }

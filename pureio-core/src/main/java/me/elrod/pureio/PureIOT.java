@@ -156,13 +156,13 @@ public abstract class PureIOT<A> {
     // This is taken almost directly from FJ for now.
     // Credit:
     // https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/PureIOT.java
-    public A run() {
+    public A run(Function<TerminalOperation<PureIOT<A>>, PureIOT<A>> fn) {
         PureIOT<A> current = this;
         while (true) {
             final Either<TerminalOperation<PureIOT<A>>, A> x = current.resume();
             if (x.isLeft()) {
                 Either.LeftP<TerminalOperation<PureIOT<A>>, A> y = x.projectLeft();
-                current = UnsafePerformIO.unsafePerformIOT(y.unsafeValue());
+                current = fn.apply(y.unsafeValue());
             } else {
                 Either.RightP<TerminalOperation<PureIOT<A>>, A> y = x.projectRight();
                 return y.unsafeValue();
