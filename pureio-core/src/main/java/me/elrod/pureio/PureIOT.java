@@ -4,6 +4,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
+ * A trampolining free IO monad over {@link TerminalOperation}.
+ *
  * {@link PureIOT} takes the same approach to trampolining as
  * {@link Trampoline} except it is specialized to {@link TerminalOperation}
  * because Java doesn't give us the ability to abstract over type constructors.
@@ -11,13 +13,14 @@ import java.util.function.Function;
  * So, much of this is like a huge copypaste mix of {@link PureIO} and
  * {@link Trampoline} into one mess of a structure.
  *
- * The end result, however, is a trampolining free IO monad, which might work.
+ * The end result, however, is a trampolining free IO monad.
  *
  * Where {@link Trampoline} is <code>Codensity (Free Identity)</code>, and
  * {@link PureIO} is <code>Free TerminalOperation</code>, {@link PureIOT}
  * is <code>Codensity (Free TerminalOperation)</code>.
  *
- * Right now, it lacks a <code>run()</code> method.
+ * We include a {@link run} method which can be passed an interpreter. The
+ * interpreter should use {@link TerminalOperation#cata}.
  */
 public abstract class PureIOT<A> {
     private PureIOT() {}
@@ -108,7 +111,6 @@ public abstract class PureIOT<A> {
                 o -> k.apply(o).flatMap(fn));
         }
 
-        @SuppressWarnings("unchecked")
         public Either<TerminalOperation<PureIOT<A>>, A> resume() {
             return sub.cata(
                 // Normal
@@ -117,24 +119,10 @@ public abstract class PureIOT<A> {
                     v -> k.apply(v).resume(),
 
                     // More(kk)
-                    kk -> Either.left(kk.map(
-                                          new Function<PureIOT<Object>, PureIOT<A>>() {
-                                              public PureIOT<A> apply(PureIOT<Object> x) {
-                                                  // Holy crap this is terrible.
-                                                  // If you are a future employer, I swear I don't normally write
-                                                  // code like this.
-                                                  return x.flatMap(k);
-                                              }
-                                          }))),
+                    kk -> Either.left(kk.map(x -> x.flatMap(k)))),
 
                 // Codensity
-                c -> c.sub.flatMap(
-                    new Function<Object, PureIOT<A>>() {
-                        public PureIOT<A> apply(Object o) {
-                            // Ugh, I want to cry.
-                            return ((Codensity<Object>)c).k.apply(o).flatMap(k);
-                        }
-                    }).resume());
+                c -> c.sub.flatMap(o -> c.k.apply(o).flatMap(k)).resume());
         }
     }
 
@@ -145,33 +133,35 @@ public abstract class PureIOT<A> {
         return new Codensity<B>((Normal<Object>) a, (Function<Object, PureIOT<B>>) k);
     }
 
-    public static <A> PureIOT<A> pure(final A x) {
+    protected static <A> PureIOT<A> pure(final A x) {
         return new Pure<A>(x);
     }
 
-    public static <A> PureIOT<A> suspend(final TerminalOperation<PureIOT<A>> x) {
+    protected static <A> PureIOT<A> suspend(final TerminalOperation<PureIOT<A>> x) {
         return new Suspend<A>(x);
     }
 
-    // def forever[A, B](fa: F[A]): F[B] = bind(fa)(_ => forever(fa))
+    /**
+     * Monadic forever. Does a computation over and over again, indefinitely.
+     */
     public static <A, B> PureIOT<B> forever(final PureIOT<A> x) {
         return x.flatMap(y -> forever(x));
     }
 
-    // This is taken almost directly from FJ for now.
-    // Credit:
-    // https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/PureIOT.java
-    public A run(Function<TerminalOperation<PureIOT<A>>, PureIOT<A>> fn) {
+    /**
+     * Run this monad with the passed interpreter.
+     *
+     * The structure of this method is taken from FunctionalJava.
+     * https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/Trampoline.java
+     */
+    public A run(Function<TerminalOperation<PureIOT<A>>, PureIOT<A>> interpreter) {
         PureIOT<A> current = this;
         while (true) {
             final Either<TerminalOperation<PureIOT<A>>, A> x = current.resume();
-            if (x.isLeft()) {
-                Either.LeftP<TerminalOperation<PureIOT<A>>, A> y = x.projectLeft();
-                current = fn.apply(y.unsafeValue());
-            } else {
-                Either.RightP<TerminalOperation<PureIOT<A>>, A> y = x.projectRight();
-                return y.unsafeValue();
-            }
+            if (x.isLeft())
+                current = interpreter.apply(x.projectLeft().unsafeValue());
+            else
+                return x.projectRight().unsafeValue();
         }
     }
 }
