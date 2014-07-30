@@ -153,6 +153,11 @@ public abstract class PureIOT<A> {
         return new Suspend<A>(x);
     }
 
+    // def forever[A, B](fa: F[A]): F[B] = bind(fa)(_ => forever(fa))
+    public static <A, B> PureIOT<B> forever(final PureIOT<A> x) {
+        return x.flatMap(y -> forever(x));
+    }
+
     // This is taken almost directly from FJ for now.
     // Credit:
     // https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/PureIOT.java
