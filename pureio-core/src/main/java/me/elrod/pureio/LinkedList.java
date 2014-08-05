@@ -1,5 +1,6 @@
 package me.elrod.pureio;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -57,6 +58,46 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
      */
     public static <A> LinkedList<A> unit(A a) {
         return new LinkedList.Cons<A>(a, new LinkedList.Nil<A>());
+    }
+
+    private static <A> LinkedList<A> reverseHelper(LinkedList<A> initial, LinkedList<A> as) {
+        /**
+           reverse l =  rev l []
+           where
+           rev []     a = a
+           rev (x:xs) a = rev xs (x:a)
+        */
+        if (as.isEmpty())
+            return initial;
+        else
+            return reverseHelper(initial.cons(as.head()), as.tail());
+    }
+
+    /**
+     * Reverse the list.
+     *
+     * This does **NOT** trampoline and therefore will overflow the stack very
+     * quickly.
+     */
+    public LinkedList<A> reverse() {
+        return reverseHelper(new Nil<A>(), this);
+    }
+
+    private static <A> LinkedList<A> fromArrayHelper(LinkedList<A> initial, A[] as) {
+        if (as.length > 0)
+            return fromArrayHelper(initial.cons(as[0]), Arrays.copyOfRange(as, 1, as.length));
+        else
+            return initial;
+    }
+
+    /**
+     * Convert an array of As to a LinkedList of As.
+     *
+     * This does **NOT** trampoline and therefore will overflow the stack very
+     * quickly.
+     */
+    public static <A> LinkedList<A> fromArray(A[] as) {
+        return fromArrayHelper(new Nil<A>(), as).reverse();
     }
 
     public final static class Cons<A> extends LinkedList<A> {

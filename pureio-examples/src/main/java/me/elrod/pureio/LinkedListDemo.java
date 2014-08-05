@@ -5,6 +5,8 @@ import java.util.function.Function;
 /**
  * If this demo works correctly, it will print the following:
  *
+ * test
+ * array
  * hello
  * world
  * HELLO
@@ -19,6 +21,10 @@ public class LinkedListDemo {
         LinkedList<String> ll = new LinkedList.Cons<String>("hello",
                                                             new LinkedList.Cons<String>("world",
                                                                                         new LinkedList.Nil<String>()));
+
+        String[] foo = {"test", "array"};
+        LinkedList.fromArray(foo).map(demofn);
+
         ll.map(demofn);
         ll.map(x -> x.toUpperCase()).map(demofn);
     }
