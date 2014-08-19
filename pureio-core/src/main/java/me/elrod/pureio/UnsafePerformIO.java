@@ -1,6 +1,7 @@
 package me.elrod.pureio;
 
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * A compatibility interpreter for our free IO monads to make them do things in
@@ -57,5 +58,24 @@ public class UnsafePerformIO {
                 System.exit(ec);
                 return tt;
             });
+    }
+
+    public static <A> A unsafePerformFileIO(PureFileIO<A> t) {
+        return t.cata(
+            a -> a,
+            a -> a.cata(
+                (filename, f) -> {
+                    try {
+                        ArrayList<String> al = new ArrayList<String>();
+                        BufferedReader in = new BufferedReader(new FileReader(filename));
+                        while (in.ready()) {
+                            al.add(in.readLine());
+                        }
+                        in.close();
+                        return unsafePerformFileIO(f.apply(LinkedList.fromArray(al.toArray(new String[0]))));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
     }
 }
