@@ -30,11 +30,11 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
      * This does **NOT** trampoline and therefore will overflow the stack very
      * quickly.
      */
-    public final <B> B foldRight(final Function<A, Function<B, B>> fn, final B b) {
+    public final <B> B foldRight(final BiFunction<A, B, B> fn, final B b) {
         if (this.isEmpty())
             return b;
         else
-            return fn.apply(this.head()).apply(this.tail().foldRight(fn, b));
+            return fn.apply(this.head(), this.tail().foldRight(fn, b));
     }
 
     /**
@@ -100,6 +100,38 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
         return fromArrayHelper(new Nil<A>(), as).reverse();
     }
 
+    /**
+     * Append two lists together.
+     *
+     * This does **NOT** trampoline and therefore will overflow the stack very
+     * quickly.
+     */
+    public static <A> LinkedList<A> append(LinkedList<A> as, LinkedList<A> bs) {
+        if (as instanceof Nil) {
+            return bs;
+        } else {
+            // (++) (x:xs) ys = x : xs ++ ys
+            return append(as.tail(), bs).cons(as.head());
+        }
+    }
+
+    /**
+     * Concatenate a list of lists into a list.
+     *
+     * Calls {@link foldRight} and therefore does not currently trampoline.
+     */
+    @SuppressWarnings("unchecked")
+    public static <A> LinkedList<A> concat(LinkedList<LinkedList<A>> xs) {
+        // concat = foldr (++) []
+        return xs.foldRight(
+            new BiFunction<LinkedList<A>, LinkedList<A>, LinkedList<A>>() {
+                public LinkedList<A> apply(LinkedList<A> as, LinkedList<A> bs) {
+                    return LinkedList.append(as, bs);
+                }
+            },
+            (LinkedList<A>)new Nil<LinkedList<A>>());
+    }
+
     public final static class Cons<A> extends LinkedList<A> {
         A head;
         LinkedList<A> tail;
@@ -122,8 +154,7 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
         }
 
         public <B> LinkedList<B> flatMap(Function<A, LinkedList<B>> fn) {
-            throw new RuntimeException("TODO");
-            //return new Cons<>(fn.apply(head), tail.map(fn));
+            return concat(map(fn));
         }
     }
 

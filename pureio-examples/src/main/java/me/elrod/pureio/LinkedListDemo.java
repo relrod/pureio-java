@@ -11,6 +11,10 @@ import java.util.function.Function;
  * world
  * HELLO
  * WORLD
+ * test
+ * array
+ * append1
+ * append2
  *
  * It does this by mapping (using mapping to both print as a side effect and to
  * convert the text to uppercase, in separate steps).
@@ -23,9 +27,15 @@ public class LinkedListDemo {
                                                                                         new LinkedList.Nil<String>()));
 
         String[] foo = {"test", "array"};
-        LinkedList.fromArray(foo).map(demofn);
+        LinkedList<String> fooLL = LinkedList.fromArray(foo);
+        fooLL.map(demofn);
 
-        ll.map(demofn);
-        ll.map(x -> x.toUpperCase()).map(demofn);
+        String[] bar = {"append1", "append2"};
+        LinkedList<String> barLL = LinkedList.fromArray(bar);
+
+        fooLL.map(demofn);
+        fooLL.map(x -> x.toUpperCase()).map(demofn);
+
+        LinkedList.append(fooLL, barLL).map(demofn);
     }
 }
