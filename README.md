@@ -52,7 +52,7 @@ public class PureIOTest {
 See more examples in `pureio-examples/`. You might even be able to run them by
 doing `sbt pureio-examples/run`, if luck is going your way.
 
-## Running it
+## Building it (Assuming a typical Linux environment)
 
 You need [sbt](https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt)
 0.13+ and Java 8. Just download the script, `chmod +x sbt` and place it
@@ -71,6 +71,17 @@ alias sbt8='PATH=/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/:$PATH sbt -java-hom
 ```
 
 and then use `sbt8 pureio-examples/run` to run the examples.
+
+## Building it (Windows-ish)
+
+Windows Cygwin/MinGW support for building is experimental. We apparently can't
+use paulp's sbt script because it requires Bash 4 while MinGW defaults to Bash
+3. That said, you should be able to follow the instructions on the
+[sbt website](http://www.scala-sbt.org/0.13/tutorial/Manual-Installation.html#Windows)
+with minimal difficulty, after installing Java 8.
+
+Once you have a working `sbt` command, you can proceed as normal, and use
+`sbt pureio-examples/run` to run the examples.
 
 
 ## JavaDoc
