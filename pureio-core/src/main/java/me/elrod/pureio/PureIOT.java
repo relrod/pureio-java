@@ -137,7 +137,13 @@ public abstract class PureIOT<A> {
                     v -> k.apply(v).resume(),
 
                     // More(kk)
-                    kk -> Either.left(kk.map(x -> x.flatMap(k)))),
+                    // Due to a regression from java 1.8.0_11 to 1.8.0_20 (and 1.8.0_40), these types
+                    // are *required* to be written out fully.
+                    new Function<TerminalOperation<PureIOT<Object>>, Either<TerminalOperation<PureIOT<A>>, A>>() {
+                        public Either<TerminalOperation<PureIOT<A>>, A> apply(TerminalOperation<PureIOT<Object>> kk) {
+                            return Either.left(kk.map(x -> x.flatMap(k)));
+                        }
+                    }),
 
                 // Codensity
                 c -> c.sub.flatMap(o -> c.k.apply(o).flatMap(k)).resume());
