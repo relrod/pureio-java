@@ -142,9 +142,16 @@ public abstract class Trampoline<A> {
                             o -> o.normalCata(
                                 obj -> k.apply(obj),
                                 t -> t.run().flatMap(k)),
-                            c -> codensity(
-                                c.sub,
-                                o -> c.k.apply(o).flatMap(k)))),
+
+                            // Due to a regression from java 1.8.0_11 to 1.8.0_20 (and 1.8.0_40), these types
+                            // are *required* to be written out fully.
+                            new Function<Codensity<Object>, Trampoline<A>>() {
+                                public Trampoline<A> apply(Codensity<Object> c) {
+                                    return codensity(
+                                        c.sub,
+                                        o -> c.k.apply(o).flatMap(k));
+                                }
+                            })),
                     // Right
                     o -> new Identity<Trampoline<A>>() {
                         public Trampoline<A> run() {
