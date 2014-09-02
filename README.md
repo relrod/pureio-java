@@ -13,35 +13,17 @@ That being said:
 
 License: **BSD-2**.
 
-## Trampolined
+## Example
 
 ```java
-public class PureIOTest {
-    private static PureIOT<Unit> program =
-      TerminalLib.putStrLnT("What is your name?")
-      .flatMap(x -> TerminalLib.readLineT())
-      .flatMap(x -> TerminalLib.putStrLnT("Hi there, " + x + "! How are you?"))
-      .flatMap(x -> TerminalLib.readLineT())
-      .flatMap(x -> TerminalLib.putStrLnT("I am also " + x + "!"))
-      .flatMap(x -> TerminalLib.exitT(0));
-
-  public static void main(String[] args) {
-    program.run(x -> UnsafePerformIO.unsafePerformIOT(x));
-  }
-}
-```
-
-## Not trampolined
-
-```java
-public class PureIOTest {
-    private static PureIO<Unit> program =
-      TerminalLib.putStrLn("What is your name?")
-      .flatMap(x -> TerminalLib.readLine())
-      .flatMap(x -> TerminalLib.putStrLn("Hi there, " + x + "! How are you?"))
-      .flatMap(x -> TerminalLib.readLine())
-      .flatMap(x -> TerminalLib.putStrLn("I am also " + x + "!"))
-      .flatMap(x -> TerminalLib.exit(0));
+public class Hello {
+  private static PureIO<Unit> program =
+    TerminalLib.putStrLn("What is your name?")
+    .flatMap(unused0 -> TerminalLib.readLine()
+             .flatMap(name -> TerminalLib.putStrLn("Hi there, " + name + "! How are you?")
+                      .flatMap(unused1 -> TerminalLib.readLine()
+                               .flatMap(resp -> TerminalLib.putStrLn("I am also " + resp + "!")
+                                        .flatMap(unused2 -> TerminalLib.exit(0))))));
 
   public static void main(String[] args) {
       UnsafePerformIO.unsafePerformIO(program);
