@@ -21,6 +21,14 @@ public abstract class Either<A, B> {
     public abstract boolean isLeft();
     public abstract boolean isRight();
 
+    /**
+     * bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
+     *
+     * This is kind of like cata except it maps over both sides, returning a
+     * new Either with the result.
+     */
+    public abstract <FA, FB> Either<FA, FB> bimap(Function<A, FA> fl, Function<B, FB> fr);
+
     // Left
     private static final class Left<A, B> extends Either<A, B> {
         private final A x;
@@ -34,6 +42,9 @@ public abstract class Either<A, B> {
         public boolean isRight() { return false; }
         public <X> X cata(Function<A, X> left, Function<B, X> right) {
             return left.apply(x);
+        }
+        public <FA, FB> Either<FA, FB> bimap(Function<A, FA> fl, Function<B, FB> fr) {
+            return new Left<FA, FB>(fl.apply(this.x));
         }
     }
 
@@ -50,6 +61,9 @@ public abstract class Either<A, B> {
         public boolean isRight() { return true; }
         public <X> X cata(Function<A, X> left, Function<B, X> right) {
             return right.apply(x);
+        }
+        public <FA, FB> Either<FA, FB> bimap(Function<A, FA> fl, Function<B, FB> fr) {
+            return new Right<FA, FB>(fr.apply(this.x));
         }
     }
 
