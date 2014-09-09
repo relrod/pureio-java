@@ -1,32 +1,28 @@
-#!/usr/bin/env bash
-
+# Generated via docs-deploy:
+# https://github.com/CodeBlock/docs-deploy
+git_project="CodeBlock/pureio-java"
+git_url="git@github.com:CodeBlock/pureio-java.git"
 cwd="$( cd "${BASH_SOURCE[0]%/*}" && pwd )"
 cd "$cwd/.."
+function generate {
+    PATH=/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/:$PATH
+    sbt -java-home /usr/lib/jvm/java-1.8.0-openjdk.x86_64/ doc
+}
 
-PATH=/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/:$PATH sbt -java-home /usr/lib/jvm/java-1.8.0-openjdk.x86_64/ doc
-
-f=`mktemp -d`
-git clone git@github.com:CodeBlock/pureio-java.git "$f/pureio-java.git"
-pushd "$f/pureio-java.git"
+function deploy {
+  rand_dir=`mktemp -d`
+  git clone "$git_url" "$rand_dir/repo"
+  pushd "$rand_dir/repo"
   git checkout gh-pages
-  git rm -rf api
-popd
-
-mkdir "$f/pureio-java.git/api"
-cp -rv ./pureio-core/target/scala-*/api "$f/pureio-java.git/api/pureio-core"
-cp -rv ./pureio-examples/target/scala-*/api "$f/pureio-java.git/api/pureio-examples"
-
-pushd "$f/pureio-java.git"
+  git rm -rf docs
+  popd
+  cp -rv ./pureio-core/target/scala-*/api "$rand_dir/repo/docs"
+  pushd "$rand_dir/repo"
   git add -A
-  git commit -m "[scripted] Manual docs deploy."
+  git commit -m '[scripted] documentation deployment'
   git push origin gh-pages
-popd
-rm -rf "$f"
-
-if [ $? == 0 ]; then
-  echo "*** Done: https://codeblock.github.io/pureio-java"
-  exit 0
-else
-  echo "*** ERROR!!! Fix the above and try again."
-  exit 1
-fi
+  popd
+  rm -rf "$rand_dir"
+}
+generate
+deploy
