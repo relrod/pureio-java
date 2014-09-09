@@ -84,9 +84,16 @@ public abstract class TupleTwo<A, B> {
     }
 
     /**
-     * Bifunctor map
+     * Bifunctor map.
      */
     public <C, D> TupleTwo<C, D> bimap(Function<A, C> f1, Function<B, D> f2) {
         return map1(f1).map2(f2);
+    }
+
+    /**
+     * Catamorphism.
+     */
+    public <C> C cata(Function<TupleTwo<A, B>, C> f) {
+        return f.apply(this);
     }
 }
