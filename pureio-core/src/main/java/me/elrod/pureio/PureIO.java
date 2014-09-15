@@ -8,67 +8,67 @@ import java.util.function.Function;
  * <code>Free</code> {@link TerminalOperation}.
  */
 public abstract class PureIO<A> {
-  private PureIO() {
-  }
-
-  // Functor
-  public <B> PureIO<B> map(Function<A, B> f) {
-    return cata(
-      a -> PureIO.pure(f.apply(a)),
-      a -> PureIO.free(a.map(k -> k.map(f))));
-  }
-
-  // Free monad
-  public <B> PureIO<B> flatMap(Function<A, PureIO<B>> f) {
-    return cata(f, a -> PureIO.free(a.map(k -> k.flatMap(f))));
-  }
-
-  public abstract <B> B cata(
-    Function<A, B> pure,
-    Function<TerminalOperation<PureIO<A>>, B> free);
-
-  //----------------------------------------------------------------------
-
-  final static class Pure<A> extends PureIO<A> {
-    private A a;
-
-    public Pure(A a) {
-      this.a = a;
+    private PureIO() {
     }
 
-    public <B> B cata(
-      Function<A, B> pure,
-      Function<TerminalOperation<PureIO<A>>, B> free) {
-        return pure.apply(a);
-    }
-  }
-
-
-  public static <A> PureIO<A> pure(A a) {
-    return new Pure<A>(a);
-  }
-
-  //----------------------------------------------------------------------
-
-  final static class Free<A> extends PureIO<A> {
-    private TerminalOperation<PureIO<A>> a;
-
-    public Free(TerminalOperation<PureIO<A>> a) {
-      this.a = a;
+    // Functor
+    public <B> PureIO<B> map(Function<A, B> f) {
+        return cata(
+            a -> PureIO.pure(f.apply(a)),
+            a -> PureIO.free(a.map(k -> k.map(f))));
     }
 
-    public <B> B cata(
-      Function<A, B> pure,
-      Function<TerminalOperation<PureIO<A>>, B> free) {
-        return free.apply(a);
+    // Free monad
+    public <B> PureIO<B> flatMap(Function<A, PureIO<B>> f) {
+        return cata(f, a -> PureIO.free(a.map(k -> k.flatMap(f))));
     }
-  }
 
-  public static <A> PureIO<A> free(TerminalOperation<PureIO<A>> a) {
-    return new Free<A>(a);
-  }
+    public abstract <B> B cata(
+        Function<A, B> pure,
+        Function<TerminalOperation<PureIO<A>>, B> free);
 
-  public static <A,B> PureIO<B> forever(PureIO<A> x) {
-      return x.flatMap(unused -> forever(x));
-  }
+    //----------------------------------------------------------------------
+
+    final static class Pure<A> extends PureIO<A> {
+        private A a;
+
+        public Pure(A a) {
+            this.a = a;
+        }
+
+        public <B> B cata(
+            Function<A, B> pure,
+            Function<TerminalOperation<PureIO<A>>, B> free) {
+            return pure.apply(a);
+        }
+    }
+
+
+    public static <A> PureIO<A> pure(A a) {
+        return new Pure<A>(a);
+    }
+
+    //----------------------------------------------------------------------
+
+    final static class Free<A> extends PureIO<A> {
+        private TerminalOperation<PureIO<A>> a;
+
+        public Free(TerminalOperation<PureIO<A>> a) {
+            this.a = a;
+        }
+
+        public <B> B cata(
+            Function<A, B> pure,
+            Function<TerminalOperation<PureIO<A>>, B> free) {
+            return free.apply(a);
+        }
+    }
+
+    public static <A> PureIO<A> free(TerminalOperation<PureIO<A>> a) {
+        return new Free<A>(a);
+    }
+
+    public static <A,B> PureIO<B> forever(PureIO<A> x) {
+        return x.flatMap(unused -> forever(x));
+    }
 }
