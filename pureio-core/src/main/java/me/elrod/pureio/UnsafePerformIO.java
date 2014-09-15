@@ -32,8 +32,7 @@ public class UnsafePerformIO {
                 (ec, tt) -> {
                     System.exit(ec);
                     return unsafePerformIO(tt);
-                }
-                        ));
+                }));
     }
 
     /**
@@ -84,7 +83,6 @@ public class UnsafePerformIO {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }
-              ));
+                }));
     }
 }
