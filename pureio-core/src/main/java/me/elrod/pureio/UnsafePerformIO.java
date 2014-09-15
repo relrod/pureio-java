@@ -76,6 +76,15 @@ public class UnsafePerformIO {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }));
+                },
+                (data, f) -> {
+                    try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(data.run1(), true)))) {
+                            out.print(data.run2());
+                            return unsafePerformFileIO(f);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+              ));
     }
 }

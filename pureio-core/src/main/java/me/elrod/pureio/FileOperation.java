@@ -11,32 +11,29 @@ import java.util.function.Function;
     }
 
     public abstract <B> B cata(
-        BiFunction<String, Function<LinkedList<String>, A>, B> readLines);
+        BiFunction<String, Function<LinkedList<String>, A>, B> readLines,
+        BiFunction<TupleTwo<String, String>, A, B> appendString);
 
     /**
      * An action which might (in a typical environment) append a string to a
      * file.
      */
-    /*final static class AppendString<A> extends FileOperation<A> {
+    final static class AppendString<A> extends FileOperation<A> {
+        // TODO: Does this /really/ need to be TupleTwo? I feel like it doesn't.
+        private TupleTwo<String,String> x;
         private A a;
-        private String filename;
-        private String text;
 
-        public AppendString(
-            String filename,
-            String text,
-            A a) {
-            this.filename = filename;
-            this.text = text;
+        public AppendString(TupleTwo<String, String> x, A a) {
+            this.x = x;
             this.a = a;
         }
 
-        public abstract <B> B cata(
-            Function<String, Function<String, Function<A, B>>> appendString) {
-            return appendString.apply(this.filename).apply(this.text).apply(this.a);
+        public <B> B cata(
+            BiFunction<String, Function<LinkedList<String>, A>, B> readLines,
+            BiFunction<TupleTwo<String, String>, A, B> appendString) {
+            return appendString.apply(this.x, this.a);
         }
     }
-    */
 
     /**
      * An action which might (in a typical environment) read lines from a file
@@ -52,7 +49,8 @@ import java.util.function.Function;
         }
 
         public <B> B cata(
-            BiFunction<String, Function<LinkedList<String>, A>, B> readLines) {
+            BiFunction<String, Function<LinkedList<String>, A>, B> readLines,
+            BiFunction<TupleTwo<String, String>, A, B> appendString) {
             return readLines.apply(this.filename, this.f);
         }
     }
@@ -60,16 +58,12 @@ import java.util.function.Function;
     // Functor
     public <B> FileOperation<B> map(Function<A, B> f) {
         return cata(
-            (filename, s) -> new ReadLines<B>(filename, x -> f.apply(s.apply(x)))
+            (filename, s) -> new ReadLines<B>(filename, x -> f.apply(s.apply(x))),
+            (data, a)     -> new AppendString<B>(data, f.apply(a))
         );
     }
 
     public PureFileIO<A> liftF() {
       return PureFileIO.free(map(x -> PureFileIO.pure(x)));
     }
-
-    /*    public PureIOT<A> liftT() {
-      return PureIOT.suspend(map(x -> PureIOT.pure(x)));
-    }
-    */
 }
