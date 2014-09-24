@@ -2,8 +2,17 @@ language: java
 jdk:
   - oraclejdk8
 install:
+  - pwd > /tmp/project
   - sudo apt-get update -qq
   - curl -O https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt
   - chmod +x sbt
   - sudo mv -f sbt /usr/local/bin/
-script: sbt compile
+  - wget -O ~/java8-20.tar.gz http://download.java.net/jdk8u20/archive/b24/binaries/jdk-8u20-fcs-bin-b24-linux-x64-23_jul_2014.tar.gz
+  - cd ~ && tar -xvf java8-20.tar.gz
+  - wget -O ~/java8-40.tar.gz http://download.java.net/jdk8u40/archive/b07/binaries/jdk-8u40-ea-bin-b07-linux-x64-23_sep_2014.tar.gz
+  - cd ~ && tar -xvf java8-40.tar.gz
+script:
+  - cd "$(cat /tmp/project)"
+  - sbt clean compile
+  - PATH=~/jdk1.8.0_20/bin/:$PATH sbt -java-home ~/jdk1.8.0_20/ clean compile
+  - PATH=~/jdk1.8.0_40/bin/:$PATH sbt -java-home ~/jdk1.8.0_40/ clean compile
