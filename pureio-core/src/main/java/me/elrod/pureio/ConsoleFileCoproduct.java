@@ -69,4 +69,18 @@ public class ConsoleFileCoproduct<A> {
     public <X> X cata(Function<PureConsoleIO<A>, X> p, Function<PureFileIO<A>, X> f) {
         return this.x.cata(p, f);
     }
+
+    /**
+     * Functor map over the coproduct.
+     *
+     * <br>
+     * <code>
+     * instance (Functor f, Functor g) => Functor (Coproduct f g) where
+     * fmap f = Coproduct . coproduct (Left . fmap f) (Right . fmap f)
+     * </code>
+     **/
+    public <B> ConsoleFileCoproduct<B> map(Function<A, B> f) {
+        return new ConsoleFileCoproduct<B>(this.cata(x -> Either.left(x.map(f)),
+                                                     x -> Either.right(x.map(f))));
+    }
 }
