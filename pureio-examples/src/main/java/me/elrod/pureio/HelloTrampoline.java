@@ -1,7 +1,7 @@
 import me.elrod.pureio.*;
 
 public class HelloTrampoline {
-    private static PureIOT<Unit> program =
+    private static PureConsoleIOT<Unit> program =
         TerminalLib.putStrLnT("What is your name?")
         .flatMap(x -> TerminalLib.readLineT()
                  .flatMap(name -> TerminalLib.putStrLnT("Hi there, " + name + "! How are you?")

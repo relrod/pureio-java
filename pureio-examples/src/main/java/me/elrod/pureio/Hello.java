@@ -1,7 +1,7 @@
 import me.elrod.pureio.*;
 
 public class Hello {
-    private static PureIO<Unit> program =
+    private static PureConsoleIO<Unit> program =
         TerminalLib.putStrLn("What is your name?")
         .flatMap(x -> TerminalLib.readLine()
                  .flatMap(name -> TerminalLib.putStrLn("Hi there, " + name + "! How are you?")

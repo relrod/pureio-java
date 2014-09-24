@@ -6,26 +6,26 @@ import java.util.function.Function;
 /**
  * A trampolining free IO monad over {@link TerminalOperation}.
  *
- * {@link PureIOT} takes the same approach to trampolining as
+ * {@link PureConsoleIOT} takes the same approach to trampolining as
  * {@link Trampoline} except it is specialized to {@link TerminalOperation}
  * because Java doesn't give us the ability to abstract over type constructors.
  *
- * So, much of this is like a huge copypaste mix of {@link PureIO} and
+ * So, much of this is like a huge copypaste mix of {@link PureConsoleIO} and
  * {@link Trampoline} into one mess of a structure.
  *
  * The end result, however, is a trampolining free IO monad.
  *
  * Where {@link Trampoline} is <code>Codensity (Free Identity)</code>, and
- * {@link PureIO} is <code>Free TerminalOperation</code>, {@link PureIOT}
+ * {@link PureConsoleIO} is <code>Free TerminalOperation</code>, {@link PureConsoleIOT}
  * is <code>Codensity (Free TerminalOperation)</code>.
  *
  * We include a {@link run} method which can be passed an interpreter. The
  * interpreter should use {@link TerminalOperation#cata}.
  */
-public abstract class PureIOT<A> {
-    private PureIOT() {}
+public abstract class PureConsoleIOT<A> {
+    private PureConsoleIOT() {}
 
-    public abstract Either<TerminalOperation<PureIOT<A>>, A> resume();
+    public abstract Either<TerminalOperation<PureConsoleIOT<A>>, A> resume();
 
     public abstract <R> R cata(
         final Function<Normal<A>, R> normal,
@@ -35,28 +35,28 @@ public abstract class PureIOT<A> {
      * Monadic bind. Internally, this is reified to the type level, in order for
      * the trampolining technique to work.
      */
-    public abstract <B> PureIOT<B> flatMap(final Function<A, PureIOT<B>> fn);
+    public abstract <B> PureConsoleIOT<B> flatMap(final Function<A, PureConsoleIOT<B>> fn);
 
     /**
      * Functor map. This is implemented in terms of {@link flatMap}.
      */
-    public <B> PureIOT<B> map(final Function<A, B> fn) {
+    public <B> PureConsoleIOT<B> map(final Function<A, B> fn) {
         return this.flatMap(x -> pure(fn.apply(x)));
     }
 
     /**
      * Applicative pattern - function application.
      */
-    public <B> PureIOT<B> applyVia(final PureIOT<Function<A, B>> fn) {
+    public <B> PureConsoleIOT<B> applyVia(final PureConsoleIOT<Function<A, B>> fn) {
         return fn.flatMap(y -> flatMap(z -> pure(y.apply(z))));
     }
 
-    private static abstract class Normal<A> extends PureIOT<A> {
+    private static abstract class Normal<A> extends PureConsoleIOT<A> {
         public abstract <R> R normalCata(
             final Function<A, R> pure,
-            final Function<TerminalOperation<PureIOT<A>>, R> suspend);
+            final Function<TerminalOperation<PureConsoleIOT<A>>, R> suspend);
 
-        public <B> PureIOT<B> flatMap(final Function<A, PureIOT<B>> fn) {
+        public <B> PureConsoleIOT<B> flatMap(final Function<A, PureConsoleIOT<B>> fn) {
             return codensity(this, fn);
         }
     }
@@ -76,19 +76,19 @@ public abstract class PureIOT<A> {
 
         public <R> R normalCata(
             final Function<A, R> pure,
-            final Function<TerminalOperation<PureIOT<A>>, R> suspend) {
+            final Function<TerminalOperation<PureConsoleIOT<A>>, R> suspend) {
             return pure.apply(this.value);
         }
 
-        public Either<TerminalOperation<PureIOT<A>>, A> resume() {
+        public Either<TerminalOperation<PureConsoleIOT<A>>, A> resume() {
             return Either.right(this.value);
         }
     }
 
     private static final class Suspend<A> extends Normal<A> {
-        private final TerminalOperation<PureIOT<A>> suspension;
+        private final TerminalOperation<PureConsoleIOT<A>> suspension;
 
-        private Suspend(final TerminalOperation<PureIOT<A>> s) {
+        private Suspend(final TerminalOperation<PureConsoleIOT<A>> s) {
             this.suspension = s;
         }
 
@@ -100,17 +100,17 @@ public abstract class PureIOT<A> {
 
         public <R> R normalCata(
             final Function<A, R> pure,
-            final Function<TerminalOperation<PureIOT<A>>, R> suspend) {
+            final Function<TerminalOperation<PureConsoleIOT<A>>, R> suspend) {
             return suspend.apply(this.suspension);
         }
-        public Either<TerminalOperation<PureIOT<A>>, A> resume() {
+        public Either<TerminalOperation<PureConsoleIOT<A>>, A> resume() {
             return Either.left(this.suspension);
         }
     }
 
-    private static final class Codensity<A> extends PureIOT<A> {
+    private static final class Codensity<A> extends PureConsoleIOT<A> {
         private final Normal<Object> sub;
-        private final Function<Object, PureIOT<A>> k;
+        private final Function<Object, PureConsoleIOT<A>> k;
 
         public <R> R cata(
             final Function<Normal<A>, R> normal,
@@ -118,18 +118,18 @@ public abstract class PureIOT<A> {
             return codensity.apply(this);
         }
 
-        private Codensity(Normal<Object> sub, Function<Object, PureIOT<A>> k) {
+        private Codensity(Normal<Object> sub, Function<Object, PureConsoleIOT<A>> k) {
             this.sub = sub;
             this.k = k;
         }
 
-        public <B> PureIOT<B> flatMap(final Function<A, PureIOT<B>> fn) {
+        public <B> PureConsoleIOT<B> flatMap(final Function<A, PureConsoleIOT<B>> fn) {
             return codensity(
                 sub,
                 o -> k.apply(o).flatMap(fn));
         }
 
-        public Either<TerminalOperation<PureIOT<A>>, A> resume() {
+        public Either<TerminalOperation<PureConsoleIOT<A>>, A> resume() {
             return sub.cata(
                 // Normal
                 n -> n.normalCata(
@@ -139,8 +139,8 @@ public abstract class PureIOT<A> {
                     // More(kk)
                     // Due to a regression from java 1.8.0_11 to 1.8.0_20 (and 1.8.0_40), these types
                     // are *required* to be written out fully.
-                    new Function<TerminalOperation<PureIOT<Object>>, Either<TerminalOperation<PureIOT<A>>, A>>() {
-                        public Either<TerminalOperation<PureIOT<A>>, A> apply(TerminalOperation<PureIOT<Object>> kk) {
+                    new Function<TerminalOperation<PureConsoleIOT<Object>>, Either<TerminalOperation<PureConsoleIOT<A>>, A>>() {
+                        public Either<TerminalOperation<PureConsoleIOT<A>>, A> apply(TerminalOperation<PureConsoleIOT<Object>> kk) {
                             return Either.left(kk.map(x -> x.flatMap(k)));
                         }
                     }),
@@ -153,22 +153,22 @@ public abstract class PureIOT<A> {
     @SuppressWarnings("unchecked")
     protected static <A, B> Codensity<B> codensity(
         final Normal<A> a,
-        final Function<A, PureIOT<B>> k) {
-        return new Codensity<B>((Normal<Object>) a, (Function<Object, PureIOT<B>>) k);
+        final Function<A, PureConsoleIOT<B>> k) {
+        return new Codensity<B>((Normal<Object>) a, (Function<Object, PureConsoleIOT<B>>) k);
     }
 
-    protected static <A> PureIOT<A> pure(final A x) {
+    protected static <A> PureConsoleIOT<A> pure(final A x) {
         return new Pure<A>(x);
     }
 
-    protected static <A> PureIOT<A> suspend(final TerminalOperation<PureIOT<A>> x) {
+    protected static <A> PureConsoleIOT<A> suspend(final TerminalOperation<PureConsoleIOT<A>> x) {
         return new Suspend<A>(x);
     }
 
     /**
      * Monadic forever. Does a computation over and over again, indefinitely.
      */
-    public static <A, B> PureIOT<B> forever(final PureIOT<A> x) {
+    public static <A, B> PureConsoleIOT<B> forever(final PureConsoleIOT<A> x) {
         return x.flatMap(y -> forever(x));
     }
 
@@ -178,10 +178,10 @@ public abstract class PureIOT<A> {
      * The structure of this method is taken from FunctionalJava.
      * https://github.com/functionaljava/functionaljava/blob/master/core/src/main/java/fj/control/Trampoline.java
      */
-    public A run(Function<TerminalOperation<PureIOT<A>>, PureIOT<A>> interpreter) {
-        PureIOT<A> current = this;
+    public A run(Function<TerminalOperation<PureConsoleIOT<A>>, PureConsoleIOT<A>> interpreter) {
+        PureConsoleIOT<A> current = this;
         while (true) {
-            final Either<TerminalOperation<PureIOT<A>>, A> x = current.resume();
+            final Either<TerminalOperation<PureConsoleIOT<A>>, A> x = current.resume();
             if (x.isLeft())
                 current = interpreter.apply(x.projectLeft().unsafeValue());
             else

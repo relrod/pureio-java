@@ -77,11 +77,11 @@ import java.util.function.Function;
         (e, a) -> new Exit<B>(e, f.apply(a)));
     }
 
-    public PureIO<A> liftF() {
-      return PureIO.free(map(x -> PureIO.pure(x)));
+    public PureConsoleIO<A> liftF() {
+      return PureConsoleIO.free(map(x -> PureConsoleIO.pure(x)));
     }
 
-    public PureIOT<A> liftT() {
-      return PureIOT.suspend(map(x -> PureIOT.pure(x)));
+    public PureConsoleIOT<A> liftT() {
+      return PureConsoleIOT.suspend(map(x -> PureConsoleIOT.pure(x)));
     }
 }

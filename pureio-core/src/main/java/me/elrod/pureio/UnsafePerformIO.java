@@ -13,7 +13,7 @@ public class UnsafePerformIO {
     final static BufferedReader in =
         new BufferedReader(new InputStreamReader(System.in));
 
-    public static <A> A unsafePerformIO(PureIO<A> t) {
+    public static <A> A unsafePerformIO(PureConsoleIO<A> t) {
         return t.cata(
             a -> a,
             a -> a.cata(
@@ -36,10 +36,10 @@ public class UnsafePerformIO {
     }
 
     /**
-     * Same thing as {@link unsafePerformIO} except for {@link PureIOT}-style
+     * Same thing as {@link unsafePerformIO} except for {@link PureConsoleIOT}-style
      * trampolining.
      */
-    public static <A> PureIOT<A> unsafePerformIOT(TerminalOperation<PureIOT<A>> t) {
+    public static <A> PureConsoleIOT<A> unsafePerformIOT(TerminalOperation<PureConsoleIOT<A>> t) {
         return t.cata(
             (s, tt) -> {
                 System.out.println(s);
