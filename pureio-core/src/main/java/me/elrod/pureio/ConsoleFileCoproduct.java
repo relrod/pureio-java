@@ -80,7 +80,17 @@ public class ConsoleFileCoproduct<A> {
      * </code>
      **/
     public <B> ConsoleFileCoproduct<B> map(Function<A, B> f) {
-        return new ConsoleFileCoproduct<B>(this.cata(x -> Either.left(x.map(f)),
-                                                     x -> Either.right(x.map(f))));
+        return new ConsoleFileCoproduct<B>(
+            this.cata(
+                new Function<PureConsoleIO<A>, Either<PureConsoleIO<B>, PureFileIO<B>>>() {
+                    public Either<PureConsoleIO<B>, PureFileIO<B>> apply(PureConsoleIO<A> a) {
+                        return Either.left(a.map(f));
+                    }
+                },
+                new Function<PureFileIO<A>, Either<PureConsoleIO<B>, PureFileIO<B>>>() {
+                    public Either<PureConsoleIO<B>, PureFileIO<B>> apply(PureFileIO<A> a) {
+                        return Either.right(a.map(f));
+                    }
+                }));
     }
 }
