@@ -36,7 +36,7 @@ public class ConsoleFileCoproduct<A> {
      *
      * <br>
      * <code>
-     * left :: f a -> Coproduct f g a    <br>
+     * left :: f a -&gt; Coproduct f g a    <br>
      * left = Coproduct . Left
      * </code>
      */
@@ -49,7 +49,7 @@ public class ConsoleFileCoproduct<A> {
      *
      * <br>
      * <code>
-     * right :: g a -> Coproduct f g a    <br>
+     * right :: g a -&gt; Coproduct f g a    <br>
      * right = Coproduct . Right
      * </code>
      */
@@ -62,7 +62,9 @@ public class ConsoleFileCoproduct<A> {
      *
      * <br>
      * <code>
-     * coproduct :: (f a -> b) -> (g a -> b) -> Coproduct f g a -> b    <br>
+     * coproduct :: (f a -&gt; b) -&gt; (g a -&gt; b) -&gt;
+     * Coproduct f g a -&gt; b
+     * <br>
      * coproduct f g = either f g . getCoproduct
      * </code>
      */
@@ -75,7 +77,7 @@ public class ConsoleFileCoproduct<A> {
      *
      * <br>
      * <code>
-     * instance (Functor f, Functor g) => Functor (Coproduct f g) where
+     * instance (Functor f, Functor g) =&gt; Functor (Coproduct f g) where
      * fmap f = Coproduct . coproduct (Left . fmap f) (Right . fmap f)
      * </code>
      **/
