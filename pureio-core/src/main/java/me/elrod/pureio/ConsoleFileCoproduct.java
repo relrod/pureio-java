@@ -15,8 +15,8 @@ import java.util.function.Function;
  * use of {@link PureConsoleIOT} here.
  *
  * This structure makes use of {@link Either} and is very similar to
- * <code>Either<PureConsoleIO<A>, PureFileIO<A>></code> except that we write some
- * useful instances over it. That is,
+ * <code>Either&lt;PureConsoleIO<A>, PureFileIO<A>&gt;</code> except that we
+ * write some useful instances over it. That is,
  * <code>A =&gt; F[A] \/ G[A]</code> is a functor, given functors F and G.
  * We can then construct a free monad over this to combine both grammars.
  *
