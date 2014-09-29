@@ -1,6 +1,5 @@
 package me.elrod.pureio;
 
-import java.io.*;
 import java.util.function.Function;
 
 /**
