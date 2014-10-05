@@ -5,8 +5,8 @@ git_url="git@github.com:CodeBlock/pureio-java.git"
 cwd="$( cd "${BASH_SOURCE[0]%/*}" && pwd )"
 cd "$cwd/.."
 function generate {
-    PATH=/usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/:$PATH
-    sbt -java-home /usr/lib/jvm/java-1.8.0-openjdk.x86_64/ doc
+    PATH=/usr/lib/jvm/java-1.8.0-openjdk/bin/:$PATH
+    sbt -java-home /usr/lib/jvm/java-1.8.0-openjdk/ doc
 }
 
 function deploy {
