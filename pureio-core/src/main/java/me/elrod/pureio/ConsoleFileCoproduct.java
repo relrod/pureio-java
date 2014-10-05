@@ -7,15 +7,15 @@ import java.util.function.Function;
  * Here we demonstrate how you might use the concept of a coproduct to
  * combine grammars of various types of I/O.
  *
- * In this particular case, we build up a coproduct over {@link PureConsoleIO}
- * and {@link PureFileIO}.
+ * In this particular case, we build up a coproduct over {@link TerminalOperation}
+ * and {@link FileOperation}.
  *
  * Using coproducts causes the trampolining technique to no longer work (and
  * it would be nice to find a solution to this in the future), so we don't make
- * use of {@link PureConsoleIOT} here.
+ * use of {@link TerminalOperationT} here.
  *
  * This structure makes use of {@link Either} and is very similar to
- * <code>Either&lt;PureConsoleIO<A>, PureFileIO<A>&gt;</code> except that we
+ * <code>Either&lt;TerminalOperation<A>, FileOperation<A>&gt;</code> except that we
  * write some useful instances over it. That is,
  * <code>A =&gt; F[A] \/ G[A]</code> is a functor, given functors F and G.
  * We can then construct a free monad over this to combine both grammars.
@@ -25,14 +25,14 @@ import java.util.function.Function;
  * write one very specific instance of this construct.
  */
 public class ConsoleFileCoproduct<A> {
-    private Either<PureConsoleIO<A>, PureFileIO<A>> x;
+    private Either<TerminalOperation<A>, FileOperation<A>> x;
 
-    public ConsoleFileCoproduct(Either<PureConsoleIO<A>, PureFileIO<A>> either) {
+    public ConsoleFileCoproduct(Either<TerminalOperation<A>, FileOperation<A>> either) {
         this.x = either;
     }
 
     /**
-     * Lift a PureConsoleIO.
+     * Lift a TerminalOperation.
      *
      * <br>
      * <code>
@@ -40,12 +40,12 @@ public class ConsoleFileCoproduct<A> {
      * left = Coproduct . Left
      * </code>
      */
-    public static <A> ConsoleFileCoproduct<A> left(PureConsoleIO<A> p) {
+    public static <A> ConsoleFileCoproduct<A> left(TerminalOperation<A> p) {
         return new ConsoleFileCoproduct<A>(Either.left(p));
     }
 
     /**
-     * Lift a PureFileIO.
+     * Lift a FileOperation.
      *
      * <br>
      * <code>
@@ -53,7 +53,7 @@ public class ConsoleFileCoproduct<A> {
      * right = Coproduct . Right
      * </code>
      */
-    public static <A> ConsoleFileCoproduct<A> right(PureFileIO<A> f) {
+    public static <A> ConsoleFileCoproduct<A> right(FileOperation<A> f) {
         return new ConsoleFileCoproduct<A>(Either.right(f));
     }
 
@@ -68,7 +68,7 @@ public class ConsoleFileCoproduct<A> {
      * coproduct f g = either f g . getCoproduct
      * </code>
      */
-    public <X> X cata(Function<PureConsoleIO<A>, X> p, Function<PureFileIO<A>, X> f) {
+    public <X> X cata(Function<TerminalOperation<A>, X> p, Function<FileOperation<A>, X> f) {
         return this.x.cata(p, f);
     }
 
@@ -84,13 +84,13 @@ public class ConsoleFileCoproduct<A> {
     public <B> ConsoleFileCoproduct<B> map(Function<A, B> f) {
         return new ConsoleFileCoproduct<B>(
             this.cata(
-                new Function<PureConsoleIO<A>, Either<PureConsoleIO<B>, PureFileIO<B>>>() {
-                    public Either<PureConsoleIO<B>, PureFileIO<B>> apply(PureConsoleIO<A> a) {
+                new Function<TerminalOperation<A>, Either<TerminalOperation<B>, FileOperation<B>>>() {
+                    public Either<TerminalOperation<B>, FileOperation<B>> apply(TerminalOperation<A> a) {
                         return Either.left(a.map(f));
                     }
                 },
-                new Function<PureFileIO<A>, Either<PureConsoleIO<B>, PureFileIO<B>>>() {
-                    public Either<PureConsoleIO<B>, PureFileIO<B>> apply(PureFileIO<A> a) {
+                new Function<FileOperation<A>, Either<TerminalOperation<B>, FileOperation<B>>>() {
+                    public Either<TerminalOperation<B>, FileOperation<B>> apply(FileOperation<A> a) {
                         return Either.right(a.map(f));
                     }
                 }));
