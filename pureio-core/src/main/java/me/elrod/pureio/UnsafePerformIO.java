@@ -85,4 +85,50 @@ public class UnsafePerformIO {
                     }
                 }));
     }
+
+    public static <A> A unsafePerformConsoleFileIO(ConsoleFileFree<A> t) {
+        return t.cata(
+            a -> a,
+            a -> a.cata(
+                // Left side is a PureConsoleIO, right side is a PureFileIO.
+                left -> left.cata(
+                    (s, tt) -> {
+                        System.out.println(s);
+                        return unsafePerformConsoleFileIO(tt);
+                    },
+                    f       -> {
+                        try {
+                            String s = in.readLine();
+                            return unsafePerformConsoleFileIO(f.apply(s));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    (ec, tt) -> {
+                        System.exit(ec);
+                        return unsafePerformConsoleFileIO(tt);
+                    }),
+                right -> right.cata(
+                    (filename, f) -> {
+                        try {
+                            ArrayList<String> al = new ArrayList<String>();
+                            BufferedReader in = new BufferedReader(new FileReader(filename));
+                            while (in.ready()) {
+                                al.add(in.readLine());
+                            }
+                            in.close();
+                            return unsafePerformConsoleFileIO(f.apply(LinkedList.fromArray(al.toArray(new String[0]))));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    (data, f) -> {
+                        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(data.run1(), true)))) {
+                                out.print(data.run2());
+                                return unsafePerformConsoleFileIO(f);
+                            } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })));
+    }
 }
