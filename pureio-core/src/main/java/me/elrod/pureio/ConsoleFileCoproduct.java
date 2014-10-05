@@ -95,4 +95,11 @@ public class ConsoleFileCoproduct<A> {
                     }
                 }));
     }
+
+    /**
+     * Lift an instance of the coproduct into a monad context.
+     */
+    public ConsoleFileFree<A> liftF() {
+      return ConsoleFileFree.free(map(x -> ConsoleFileFree.pure(x)));
+    }
 }
