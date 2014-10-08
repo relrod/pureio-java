@@ -84,4 +84,8 @@ import java.util.function.Function;
     public PureConsoleIOT<A> liftT() {
       return PureConsoleIOT.suspend(map(x -> PureConsoleIOT.pure(x)));
     }
+
+    public ConsoleFileCoproduct<A> liftConsoleFileCoproduct() {
+      return ConsoleFileCoproduct.left(this);
+    }
 }

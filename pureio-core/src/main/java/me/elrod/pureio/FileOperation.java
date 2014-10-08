@@ -66,4 +66,8 @@ import java.util.function.Function;
     public PureFileIO<A> liftF() {
       return PureFileIO.free(map(x -> PureFileIO.pure(x)));
     }
+
+    public ConsoleFileCoproduct<A> liftConsoleFileCoproduct() {
+      return ConsoleFileCoproduct.right(this);
+    }
 }
