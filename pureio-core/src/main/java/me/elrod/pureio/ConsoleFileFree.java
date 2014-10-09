@@ -1,5 +1,6 @@
 package me.elrod.pureio;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -66,5 +67,37 @@ public abstract class ConsoleFileFree<A> {
 
     public static <A> ConsoleFileFree<A> free(ConsoleFileCoproduct<ConsoleFileFree<A>> a) {
         return new Free<A>(a);
+    }
+
+    /**
+     * Evaluate each action in the sequence from left to right and collect the
+     * results.
+     *
+     * <br>
+     * <code>
+     * sequence :: Monad m =&gt; [m a] -&gt; m [a]
+     * sequence ms = foldr k (return []) ms
+     *      where
+     *        k m m' = do { x &lt;- m; xs &lt;- m'; return (x:xs) }
+     * </code>
+     */
+    public static <A> ConsoleFileFree<LinkedList<A>> sequence(LinkedList<ConsoleFileFree<A>> ll) {
+        return ll.foldRight(
+            // k :: Monad m => m a -> m [a] -> m [a]
+            (a,b) -> a.flatMap(aPrime -> b.flatMap(bPrime -> ConsoleFileFree.pure(bPrime.cons(aPrime)))),
+            ConsoleFileFree.pure(new LinkedList.Nil<A>()));
+    }
+
+    /**
+     * Same as <code>sequence ∘ map</code>.
+     *
+     * <br>
+     * <code>
+     * mapM :: Monad m =&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+     * mapM f as = sequence (map f as)
+     * </code>
+     */
+    public static <A, B> ConsoleFileFree<LinkedList<B>> mapM(Function<A, ConsoleFileFree<B>> f, LinkedList<A> ll) {
+        return sequence(ll.map(f));
     }
 }
