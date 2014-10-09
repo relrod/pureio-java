@@ -24,6 +24,10 @@ public abstract class ConsoleFileFree<A> {
             a -> ConsoleFileFree.free(a.map(k -> k.flatMap(f))));
     }
 
+    public <B> ConsoleFileFree<B> $(Function<A, ConsoleFileFree<B>> f) {
+        return flatMap(f);
+    }
+
     public abstract <B> B cata(
         Function<A, B> pure,
         Function<ConsoleFileCoproduct<ConsoleFileFree<A>>, B> free);
