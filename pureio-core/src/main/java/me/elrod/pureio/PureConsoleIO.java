@@ -22,6 +22,10 @@ public abstract class PureConsoleIO<A> {
         return cata(f, a -> PureConsoleIO.free(a.map(k -> k.flatMap(f))));
     }
 
+    public <B> PureConsoleIO<B> $(Function<A, PureConsoleIO<B>> f) {
+        return flatMap(f);
+    }
+
     public abstract <B> B cata(
         Function<A, B> pure,
         Function<TerminalOperation<PureConsoleIO<A>>, B> free);

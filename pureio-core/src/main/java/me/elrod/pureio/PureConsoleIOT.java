@@ -37,6 +37,10 @@ public abstract class PureConsoleIOT<A> {
      */
     public abstract <B> PureConsoleIOT<B> flatMap(final Function<A, PureConsoleIOT<B>> fn);
 
+    public <B> PureConsoleIOT<B> $(final Function<A, PureConsoleIOT<B>> f) {
+        return flatMap(f);
+    }
+
     /**
      * Functor map. This is implemented in terms of {@link flatMap}.
      */

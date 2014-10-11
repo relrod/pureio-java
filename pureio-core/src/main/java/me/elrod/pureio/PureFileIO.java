@@ -22,6 +22,10 @@ public abstract class PureFileIO<A> {
         return cata(f, a -> PureFileIO.free(a.map(k -> k.flatMap(f))));
     }
 
+    public <B> PureFileIO<B> $(Function<A, PureFileIO<B>> f) {
+        return flatMap(f);
+    }
+
     public abstract <B> B cata(
         Function<A, B> pure,
         Function<FileOperation<PureFileIO<A>>, B> free);
