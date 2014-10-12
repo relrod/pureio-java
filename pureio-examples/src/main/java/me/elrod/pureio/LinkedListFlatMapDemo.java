@@ -28,7 +28,7 @@ public class LinkedListFlatMapDemo {
                             new LinkedList.Nil<String>())),
                     new LinkedList.Nil<LinkedList<String>>()));
 
-        LinkedList<String> llc = ll.flatMap(a -> a);
+        LinkedList<String> llc = ll .$ (a -> a);
         llc.map(demofn);
     }
 }

@@ -54,6 +54,13 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
     public abstract <B> LinkedList<B> flatMap(Function<A, LinkedList<B>> fn);
 
     /**
+     * Pretty "infix-alike" syntax for flatMap.
+     */
+   public <B> LinkedList<B> $(Function<A, LinkedList<B>> f) {
+        return flatMap(f);
+    }
+
+    /**
      * Monadic unit
      */
     public static <A> LinkedList<A> unit(A a) {
