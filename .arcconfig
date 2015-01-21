@@ -1,0 +1,5 @@
+{
+  "project.name"        : "pureio-java",
+  "repository.callsign" : "PJ",
+  "phabricator.uri"     : "http://phabricator.int.seresl.org"
+}
