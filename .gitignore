@@ -12,7 +12,3 @@
 hs_err_pid*
 
 target/
-
-
-# I have this locally but there's no reason for it in upstream yet. -rbe
-Maybe.java
