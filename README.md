@@ -1,6 +1,6 @@
 <img src="http://tmp.elrod.me/pureio.svg" alt="pureio-java" />
 
-[![Build Status](https://travis-ci.org/CodeBlock/pureio-java.svg?branch=master)](https://travis-ci.org/CodeBlock/pureio-java)
+[![Build Status](https://travis-ci.org/relrod/pureio-java.svg?branch=master)](https://travis-ci.org/relrod/pureio-java)
 
 Experiments with purely functional IO in Java 8.
 
