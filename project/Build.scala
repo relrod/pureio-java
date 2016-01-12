@@ -7,7 +7,8 @@ object BuildSettings {
     version := "0.0.1-SNAPSHOT",
     publishTo := Some(Resolver.file("file", new File("releases"))),
     javacOptions in (Compile, compile) += "-Xlint:unchecked",
-    javacOptions in (Compile, compile) += "-deprecation"
+    javacOptions in (Compile, compile) += "-deprecation",
+    libraryDependencies += "org.functionaljava" % "functionaljava" % "4.4.1"
   )
 }
 
