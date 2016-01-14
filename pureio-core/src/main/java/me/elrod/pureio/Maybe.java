@@ -21,7 +21,7 @@ public abstract class Maybe<T> {
         return this.cata(
             new Function<T, Maybe<U>>() {
                 public Maybe<U> apply(T x) {
-                    return unit(fn.apply(x));
+                    return point(fn.apply(x));
                 }
             },
             new None<U>());
@@ -39,7 +39,7 @@ public abstract class Maybe<T> {
     }
 
     // Monad
-    public static <U> Maybe<U> unit(U x) {
+    public static <U> Maybe<U> point(U x) {
         return new Some<U>(x);
     }
 

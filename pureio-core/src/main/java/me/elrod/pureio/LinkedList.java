@@ -61,9 +61,9 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
     }
 
     /**
-     * Monadic unit
+     * Monadic/Applicative point
      */
-    public static <A> LinkedList<A> unit(A a) {
+    public static <A> LinkedList<A> point(A a) {
         return new LinkedList.Cons<A>(a, new LinkedList.Nil<A>());
     }
 
