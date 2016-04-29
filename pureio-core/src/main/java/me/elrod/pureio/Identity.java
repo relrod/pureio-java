@@ -41,6 +41,10 @@ public abstract class Identity<T> {
         };
     }
 
+    public <U> Identity<U> ρ(Function<T, U> f) {
+        return map(f);
+    }
+
     /**
      * Applicative map.
      */
@@ -57,5 +61,9 @@ public abstract class Identity<T> {
      */
     public <U> Identity<U> flatMap(Function<T, Identity<U>> f) {
         return f.apply(run());
+    }
+
+    public <U> Identity<U> $(Function<T, Identity<U>> f) {
+        return flatMap(f);
     }
 }

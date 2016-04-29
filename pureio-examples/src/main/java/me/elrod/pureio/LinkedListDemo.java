@@ -28,14 +28,14 @@ public class LinkedListDemo {
 
         String[] foo = {"test", "array"};
         LinkedList<String> fooLL = LinkedList.fromArray(foo);
-        fooLL.map(demofn);
+        fooLL .ρ (demofn);
 
         String[] bar = {"append1", "append2"};
         LinkedList<String> barLL = LinkedList.fromArray(bar);
 
-        fooLL.map(demofn);
-        fooLL.map(x -> x.toUpperCase()).map(demofn);
+        fooLL .ρ (demofn);
+        fooLL .ρ (x -> x.toUpperCase()) .ρ (demofn);
 
-        LinkedList.append(fooLL, barLL).map(demofn);
+        LinkedList.append(fooLL, barLL) .ρ (demofn);
     }
 }

@@ -9,6 +9,6 @@ public class HelloReadFiles {
   public static void main(String[] args) {
       Function<String, String> printIt = x -> { System.out.println(x); return x; };
       LinkedList<String> lines = UnsafePerformIO.unsafePerformFileIO(comp);
-      lines.map(printIt);
+      lines .ρ (printIt);
   }
 }

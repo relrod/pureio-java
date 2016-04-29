@@ -17,6 +17,10 @@ public abstract class ConsoleFileFree<A> {
             a -> ConsoleFileFree.free(a.map(k -> k.map(f))));
     }
 
+    public <B> ConsoleFileFree<B> ρ(Function<A, B> f) {
+        return map(f);
+    }
+
     // Free monad
     public <B> ConsoleFileFree<B> flatMap(Function<A, ConsoleFileFree<B>> f) {
         return cata(

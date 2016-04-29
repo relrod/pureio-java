@@ -63,6 +63,10 @@ import java.util.function.Function;
         );
     }
 
+    public <B> FileOperation<B> ρ(Function<A, B> f) {
+        return map(f);
+    }
+
     public PureFileIO<A> liftF() {
       return PureFileIO.free(map(x -> PureFileIO.pure(x)));
     }

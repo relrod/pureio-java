@@ -17,6 +17,10 @@ public abstract class PureFileIO<A> {
             a -> PureFileIO.free(a.map(k -> k.map(f))));
     }
 
+    public <B> PureFileIO<B> ρ(Function<A, B> f) {
+        return map(f);
+    }
+
     // Free monad
     public <B> PureFileIO<B> flatMap(Function<A, PureFileIO<B>> f) {
         return cata(f, a -> PureFileIO.free(a.map(k -> k.flatMap(f))));

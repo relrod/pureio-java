@@ -29,6 +29,6 @@ public class LinkedListAppendDemo {
                     new LinkedList.Nil<LinkedList<String>>()));
 
         LinkedList<String> llc = LinkedList.concat(ll);
-        llc.map(demofn);
+        llc .ρ (demofn);
     }
 }

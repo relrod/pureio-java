@@ -46,6 +46,16 @@ public abstract class LinkedList<A> /* extends Iterable<A> */ {
     public abstract <B> LinkedList<B> map(Function<A, B> fn);
 
     /**
+     * Prettier alias for map.
+     *
+     * This does **NOT** trampoline and therefore will overflow the stack very
+     * quickly.
+     */
+    public <B> LinkedList<B> ρ(Function<A, B> fn) {
+        return map(fn);
+    }
+
+    /**
      * (semi)monadic bind.
      *
      * This does **NOT** trampoline and therefore will overflow the stack very
