@@ -43,7 +43,7 @@ public abstract class Maybe<T> {
         return new Some<U>(x);
     }
 
-    public <U> Maybe<U> bind(final Function<T, Maybe<U>> fn) {
+    public <U> Maybe<U> flatMap(final Function<T, Maybe<U>> fn) {
         return this.cata(
             new Function<T, Maybe<U>>() {
                 public Maybe<U> apply(T x) {
