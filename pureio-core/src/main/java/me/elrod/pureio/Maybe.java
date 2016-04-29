@@ -17,7 +17,7 @@ public abstract class Maybe<T> {
         U none);
 
     // Functor
-    public <U> Maybe<U> fmap(final Function<T, U> fn) {
+    public <U> Maybe<U> map(final Function<T, U> fn) {
         return this.cata(
             new Function<T, Maybe<U>>() {
                 public Maybe<U> apply(T x) {
@@ -32,7 +32,7 @@ public abstract class Maybe<T> {
         return ofn.cata(
             new Function<Function<T, U>, Maybe<U>>() {
                 public Maybe<U> apply(final Function<T, U> fn) {
-                    return Maybe.this.fmap(fn);
+                    return Maybe.this.map(fn);
                 }
             },
             new None<U>());
