@@ -1,11 +1,11 @@
 import me.elrod.pureio.*;
 
 public class ForeverIO {
-    private static PureConsoleIOT<Unit> program =
-        PureConsoleIOT.forever(
-            TerminalLib.putStrLnT("If trampolining works, this will print forever!"));
+    private static PureConsoleIO<Unit> program =
+        PureConsoleIO.forever(
+            TerminalLib.putStrLn("This will print for a bit then bomb out."));
 
   public static void main(String[] args) {
-      program.run(x -> UnsafePerformIO.unsafePerformIOT(x));
+      UnsafePerformIO.unsafePerformIO(program);
   }
 }
