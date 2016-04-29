@@ -48,6 +48,10 @@ public abstract class PureConsoleIOT<A> {
         return this.flatMap(x -> pure(fn.apply(x)));
     }
 
+    public <B> PureConsoleIOT<B> ρ(final Function<A, B> fn) {
+        return map(fn);
+    }
+
     /**
      * Applicative pattern - function application.
      */

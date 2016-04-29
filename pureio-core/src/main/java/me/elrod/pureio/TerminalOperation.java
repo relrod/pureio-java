@@ -77,6 +77,10 @@ import java.util.function.Function;
         (e, a) -> new Exit<B>(e, f.apply(a)));
     }
 
+    public <B> TerminalOperation<B> ρ(Function<A, B> f) {
+        return map(f);
+    }
+
     public PureConsoleIO<A> liftF() {
       return PureConsoleIO.free(map(x -> PureConsoleIO.pure(x)));
     }

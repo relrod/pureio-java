@@ -17,6 +17,10 @@ public abstract class PureConsoleIO<A> {
             a -> PureConsoleIO.free(a.map(k -> k.map(f))));
     }
 
+    public <B> PureConsoleIO<B> ρ(Function<A, B> f) {
+        return map(f);
+    }
+
     // Free monad
     public <B> PureConsoleIO<B> flatMap(Function<A, PureConsoleIO<B>> f) {
         return cata(f, a -> PureConsoleIO.free(a.map(k -> k.flatMap(f))));

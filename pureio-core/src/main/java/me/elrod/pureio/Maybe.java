@@ -27,6 +27,10 @@ public abstract class Maybe<T> {
             new None<U>());
     }
 
+    public <U> Maybe<U> ρ(final Function<T, U> fn) {
+        return map(fn);
+    }
+
     // Applicative
     public <U> Maybe<U> applyVia(final Maybe<Function<T,U>> ofn) {
         return ofn.cata(
@@ -51,6 +55,10 @@ public abstract class Maybe<T> {
                 }
             },
             new None<U>());
+    }
+
+    public <U> Maybe<U> $(final Function<T, Maybe<U>> fn) {
+        return flatMap(fn);
     }
 
     public final static class Some<T> extends Maybe<T> {
